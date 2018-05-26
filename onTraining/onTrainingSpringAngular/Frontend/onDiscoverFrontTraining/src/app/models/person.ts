@@ -3,5 +3,5 @@ export class Person {
     name: string;
     lastName: string;
     email: string;
-    idDocument: string;    
+    numberDocument: string;    
 }

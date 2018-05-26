@@ -1,8 +1,18 @@
-<h1>Template!!</h1>
+<nav class="navbar navbar-expand-md navbar-dark bg-dark">
+  <a class="navbar-brand" href="#">On Discover</a>
+  <button class="navbar-toggler" type="button">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active"><a class="nav-link" routerLink="/person">Person</a></li>     
+    </ul>
+  </div>
+</nav>
 
-<a routerLink="/person">Person</a>
-
-<div style="background:green; padding: 20px;">
-  <router-outlet></router-outlet>
+<div class="container">  
+  <div class="jumbotron">
+    <router-outlet></router-outlet>
+  </div>
 </div>
 
