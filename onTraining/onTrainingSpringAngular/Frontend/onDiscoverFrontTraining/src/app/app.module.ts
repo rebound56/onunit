@@ -7,6 +7,8 @@ import { PersonComponent } from './components/person/person.component';
 import { AppRoutingModule } from './modules/app-routing/app-routing.module';
 import { FormsModule } from '@angular/forms';
 
+import {ReactiveFormsModule} from "@angular/forms";
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -15,7 +17,8 @@ import { FormsModule } from '@angular/forms';
   imports: [
     BrowserModule,
     AppRoutingModule,
-    FormsModule
+    FormsModule,
+    ReactiveFormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -1,44 +1,92 @@
 <h1>Person</h1>
 
+<form [formGroup]="formPerson"  (ngSubmit)="save()">
 
-<div class="row">
-  <div class="col-sm-4">
-    <div class="form-group">
-      <label for="name">Name</label>
-      <input type="text" name="name" [(ngModel)]="person.name" placeholder="Name" class="form-control"/>
+  <div class="row">
+    <div class="col-sm-4">
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input type="text" name="name" 
+          placeholder="Name" class="form-control" formControlName="controlName" [(ngModel)]="person.name" />
+        
+          <div class="alert alert-danger" *ngIf="controlName.errors && (controlName.dirty || controlName.touched)">
+            <p *ngIf="controlName.errors.required">Name is required</p>
+            <p *ngIf="controlName.errors.minlength">Name must be greater than 3 characters long</p>
+            <p *ngIf="controlName.errors.maxlength">Name must be lesser than 150 characters long</p>
+          </div>
+        
+      </div>
     </div>
-  </div>
-  <div class="col-sm-4">
-    <div class="form-group">
-      <label for="lastName">Last Name</label>
-      <input type="text" name="lastName" [(ngModel)]="person.lastName" placeholder="Last Name" class="form-control"/>
-    </div>
-  </div>
-  <div class="col-sm-4">
-    <div class="form-group">
-      <label for="email">E-mail</label>
-      <input type="email" name="email" [(ngModel)]="person.email" placeholder="E-mail" class="form-control"/>
-    </div>
-  </div>  
-  <div class="col-sm-4">
-    <div class="form-group">
-      <label for="numberDocument">Number of document</label>
-      <input type="email" name="numberDocument" [(ngModel)]="person.numberDocument" placeholder="Number of document" class="form-control"/>
-    </div>
-  </div>
-</div>
+    <div class="col-sm-4">
+      <div class="form-group">
+        <label for="lastName">Last Name</label>
+        <input type="text" name="lastName" formControlName="controlLastName" [(ngModel)]="person.lastName"
+          placeholder="Last Name" class="form-control"/>
 
-<div class="row">
-  <div class="col-sm-4">
-    Name: {{person.name | uppercase}}
+          <div class="alert alert-danger" *ngIf="controlLastName.errors && (controlLastName.dirty || controlLastName.touched)">
+            <p *ngIf="controlLastName.errors.required">Last name is required</p>
+            <p *ngIf="controlLastName.errors.minlength">Last name must be greater than 3 characters long</p>
+            <p *ngIf="controlLastName.errors.maxlength">Last name must be lesser than 200 characters long</p>
+          </div>
+
+      </div>
+    </div>
+    <div class="col-sm-4">
+      <div class="form-group">
+        <label for="email">E-mail</label>
+        <input type="email" name="email" formControlName="controlEmail" [(ngModel)]="person.email" placeholder="E-mail" class="form-control"/>
+
+        <div class="alert alert-danger" *ngIf="controlEmail.errors && (controlEmail.dirty || controlEmail.touched)">
+          <p *ngIf="controlEmail.errors.required">E-mail is required</p>
+          <p *ngIf="controlEmail.errors.minlength">E-mail must be greater than 3 characters long</p>
+          <p *ngIf="controlEmail.errors.maxlength">E-mail must be lesser than 200 characters long</p>
+          <p *ngIf="controlEmail.errors.email">E-mail is invalid</p>
+        </div>
+      </div>
+    </div>
   </div>
-  <div class="col-sm-4">
-    Last Name: {{person.lastName | uppercase}}
+  <div class="row">
+    <div class="col-sm-4">
+      <div class="form-group">
+        <label for="numberDocument">Number of document</label>
+        <input type="email" name="numberDocument" formControlName="controlNumberDocument" [(ngModel)]="person.numberDocument" placeholder="Number of document" class="form-control"/>
+        <div class="alert alert-danger" *ngIf="controlNumberDocument.errors && (controlNumberDocument.dirty || controlNumberDocument.touched)">
+          <p *ngIf="controlNumberDocument.errors.required">E-mail is required</p>
+          <p *ngIf="controlNumberDocument.errors.minlength">E-mail must be greater than 3 characters long</p>
+          <p *ngIf="controlNumberDocument.errors.maxlength">E-mail must be lesser than 200 characters long</p>          
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-4">
+      <div class="form-group">
+        <label for="gender">Gender</label>
+        <select name="gender" formControlName="controlGender" class="form-control">
+          <option *ngFor="let gender of genders" [value]="gender.value">{{gender.label}}</option>
+        </select>
+      </div>
+    </div>
+
   </div>
-  <div class="col-sm-4">
-    Email: {{person.email}}
-  </div>  
-  <div class="col-sm-4">
-    ID document: {{person.numberDocument}}
+
+  <div class="row">
+    <div class="col-sm-4">
+      Name: {{person.name | uppercase}}
+    </div>
+    <div class="col-sm-4">
+      Last Name: {{person.lastName | uppercase}}
+    </div>
+    <div class="col-sm-4">
+      Email: {{person.email}}
+    </div>  
+    <div class="col-sm-4">
+      ID document: {{person.numberDocument}}
+    </div>
   </div>
-</div>
+
+  <div class="row">
+    <div class="col-sm-4">
+      <button type="submit" class="btn btn-success form-control">Save</button>
+    </div>
+  </div>
+</form>

@@ -3,5 +3,6 @@ export class Person {
     name: string;
     lastName: string;
     email: string;
-    numberDocument: string;    
+    numberDocument: string;
+    gender: string;   
 }
