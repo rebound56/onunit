@@ -49,7 +49,7 @@
     <div class="col-sm-4">
       <div class="form-group">
         <label for="numberDocument">Number of document</label>
-        <input type="email" name="numberDocument" formControlName="controlNumberDocument" [(ngModel)]="person.numberDocument" placeholder="Number of document" class="form-control"/>
+        <input type="text" (keyup)="controlMatchNumberDocument.updateValueAndValidity()" name="numberDocument" formControlName="controlNumberDocument" [(ngModel)]="person.numberDocument" placeholder="Number of document" class="form-control"/>
         <div class="alert alert-danger" *ngIf="controlNumberDocument.errors && (controlNumberDocument.dirty || controlNumberDocument.touched)">
           <p *ngIf="controlNumberDocument.errors.required">E-mail is required</p>
           <p *ngIf="controlNumberDocument.errors.minlength">E-mail must be greater than 3 characters long</p>
@@ -60,33 +60,41 @@
 
     <div class="col-sm-4">
       <div class="form-group">
+        <label for="MatchNumberDocument">Confirm number of document</label>
+        <input type="text" name="MatchNumberDocument" formControlName="controlMatchNumberDocument" placeholder="Confirm number of document" class="form-control"/>
+        <div class="alert alert-danger" *ngIf="controlMatchNumberDocument.errors && (controlMatchNumberDocument.dirty || controlMatchNumberDocument.touched)">
+          <p *ngIf="controlMatchNumberDocument.errors.match">It must match with number document</p> 
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-4">
+      <div class="form-group">
         <label for="gender">Gender</label>
         <select name="gender" formControlName="controlGender" class="form-control">
           <option *ngFor="let gender of genders" [value]="gender.value">{{gender.label}}</option>
         </select>
+
+        <div class="alert alert-danger" *ngIf="controlGender.errors && (controlGender.dirty || controlGender.touched)">
+          <p *ngIf="controlGender.errors.required">Gender is required</p>      
+        </div>
       </div>
     </div>
 
-  </div>
-
-  <div class="row">
-    <div class="col-sm-4">
-      Name: {{person.name | uppercase}}
-    </div>
-    <div class="col-sm-4">
-      Last Name: {{person.lastName | uppercase}}
-    </div>
-    <div class="col-sm-4">
-      Email: {{person.email}}
-    </div>  
-    <div class="col-sm-4">
-      ID document: {{person.numberDocument}}
-    </div>
-  </div>
+  </div>  
 
   <div class="row">
     <div class="col-sm-4">
       <button type="submit" class="btn btn-success form-control">Save</button>
+    </div>    
+  </div>
+
+
+  <div class="row">
+    <div class="col-sm-12">
+      <p>Form value: {{formPerson.value | json}}</p>
+      <p>Form status: {{formPerson.status | json}}</p>
     </div>
   </div>
+
 </form>

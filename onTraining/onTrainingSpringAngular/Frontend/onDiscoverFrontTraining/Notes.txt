@@ -1,0 +1,161 @@
+1) Create project
+    >ng new onDiscoverFrontTraining
+
+2) Create a class
+    >ng generate class models/person
+
+3) Create person
+    >ng generate component components/Person 
+
+4) Creating routing
+    >ng generate module modules/AppRouting --module=app
+    - in app-routing.module.ts:
+        import { NgModule } from '@angular/core';
+        import { RouterModule, Routes } from '@angular/router';
+        import { PersonComponent} from '../../components/person/person.component';
+
+
+        const routes: Routes = [
+        { path: 'person', component: PersonComponent }
+        ];
+        @NgModule({  
+        exports: [RouterModule],
+        imports: [ RouterModule.forRoot(routes) ]
+        })
+        export class AppRoutingModule { }
+
+5) Creating a form with standard validators
+    - in person.component.ts
+
+        import { Component, OnInit } from '@angular/core';
+        import { Person } from '../../models/person';
+        import { FormGroup, FormControl, Validators } from '@angular/forms';        
+
+        @Component({
+            selector: 'app-person',
+            templateUrl: './person.component.html',
+            styleUrls: ['./person.component.css']
+        })
+        export class PersonComponent implements OnInit {
+
+            person : Person = {
+                id:1,
+                name:'Mauro',
+                lastName: 'German',
+                email: 'mauro.german@ondiscover.com',
+                numberDocument: '1234567',
+                gender: ''
+            }   
+
+            formPerson: FormGroup;
+            controlName: FormControl;
+
+            ngOnInit() {
+                // to add new validators
+                this.controlName = new FormControl(this.person.name,[
+                    Validators.required,
+                    Validators.minLength(3),
+                    Validators.maxLength(150)
+                ]);
+                this.formPerson = new FormGroup({
+                    controlName:this.controlName          
+                });
+            }
+        }
+    
+    - in person.component.html
+        <form [formGroup]="formPerson"  (ngSubmit)="save()">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" name="name" 
+                        placeholder="Name" class="form-control" formControlName="controlName" [(ngModel)]="person.name" />
+                        
+                        <div class="alert alert-danger" *ngIf="controlName.errors && (controlName.dirty || controlName.touched)">
+                            <p *ngIf="controlName.errors.required">Name is required</p>
+                            <p *ngIf="controlName.errors.minlength">Name must be greater than 3 characters long</p>
+                            <p *ngIf="controlName.errors.maxlength">Name must be lesser than 150 characters long</p>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </form>
+
+6) Custom validators
+    - Create a util class called CustomValidator
+        >ng generate class utils/CustomValidator
+    - in custom-validator.ts
+        import { ValidatorFn, ValidationErrors } from "@angular/forms/src/directives/validators";
+        import { AbstractControl, FormControl } from "@angular/forms/src/model";
+
+        export class CustomValidator {
+            static match(controlToCompare :FormControl) : ValidatorFn {
+                return (control : AbstractControl): {[key: string]: boolean} => {        
+                    let value = control.value;
+                    if(value === controlToCompare.value){
+                        return null;
+                    }
+                    return {'match': true}; 
+                }
+            }
+        }
+    - in person.component.ts
+        import { CustomValidator } from '../../utils/custom-validator';
+        import { FormGroup, FormControl, Validators } from '@angular/forms';
+
+
+        @Component({
+        selector: 'app-person',
+        templateUrl: './person.component.html',
+        styleUrls: ['./person.component.css']
+        })
+        export class PersonComponent implements OnInit {
+            ...
+            formPerson: FormGroup;
+            controlNumberDocument: FormControl;
+            controlMatchNumberDocument: FormControl;
+            ...
+            ngOnInit() {
+                this.controlNumberDocument = new FormControl(this.person.numberDocument,[
+                    Validators.required,
+                    Validators.minLength(3),
+                    Validators.maxLength(20),                
+                ]);
+                this.controlMatchNumberDocument= new FormControl(this.person.numberDocument,[
+                    CustomValidator.match(this.controlNumberDocument)       
+                ]);
+
+                this.formPerson = new FormGroup({                    
+                    controlNumberDocument:this.controlNumberDocument,
+                    controlMatchNumberDocument: this.controlMatchNumberDocument,                   
+                })                   
+            }
+        }
+    - in person.component.html
+         <form [formGroup]="formPerson"  (ngSubmit)="save()">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label for="numberDocument">Number of document</label>
+                        <input type="text" (keyup)="controlMatchNumberDocument.updateValueAndValidity()" name="numberDocument" formControlName="controlNumberDocument" [(ngModel)]="person.numberDocument" placeholder="Number of document" class="form-control"/>
+                        <div class="alert alert-danger" *ngIf="controlNumberDocument.errors && (controlNumberDocument.dirty || controlNumberDocument.touched)">
+                            <p *ngIf="controlNumberDocument.errors.required">E-mail is required</p>
+                            <p *ngIf="controlNumberDocument.errors.minlength">E-mail must be greater than 3 characters long</p>
+                            <p *ngIf="controlNumberDocument.errors.maxlength">E-mail must be lesser than 200 characters long</p>          
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label for="MatchNumberDocument">Confirm number of document</label>
+                        <input type="text" name="MatchNumberDocument" formControlName="controlMatchNumberDocument" placeholder="Confirm number of document" class="form-control"/>
+                        <div class="alert alert-danger" *ngIf="controlMatchNumberDocument.errors && (controlMatchNumberDocument.dirty || controlMatchNumberDocument.touched)">
+                            <p *ngIf="controlMatchNumberDocument.errors.match">It must match with number document</p> 
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>    
