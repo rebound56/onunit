@@ -4,5 +4,6 @@ export class Person {
     lastName: string;
     email: string;
     numberDocument: string;
-    gender: string;   
+    gender: string; 
+    brithdate: Date;
 }

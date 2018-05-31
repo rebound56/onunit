@@ -18,7 +18,8 @@ export class PersonComponent implements OnInit {
     lastName: 'German',
     email: 'mauro.german@ondiscover.com',
     numberDocument: '1234567',
-    gender: ''
+    gender: '',
+    brithdate: new Date()
   }
 
   genders : any ;
@@ -30,6 +31,7 @@ export class PersonComponent implements OnInit {
   controlNumberDocument: FormControl;
   controlMatchNumberDocument: FormControl;
   controlGender: FormControl;
+  controlBirthdate: FormControl;
   
 
   constructor() {
@@ -42,6 +44,11 @@ export class PersonComponent implements OnInit {
 
   ngOnInit() {
     // to add new validators
+    this.controlBirthdate = new FormControl(this.person.brithdate,[
+      Validators.required,
+      Validators.nullValidator
+    ]);
+
     this.controlName = new FormControl(this.person.name,[
       Validators.required,
       Validators.minLength(3),
@@ -79,8 +86,9 @@ export class PersonComponent implements OnInit {
       controlEmail:this.controlEmail,
       controlNumberDocument:this.controlNumberDocument,
       controlMatchNumberDocument: this.controlMatchNumberDocument,
-      controlGender:this.controlGender
-    })   
+      controlGender:this.controlGender,
+      controlBirthdate:this.controlBirthdate
+    })    
   }
 
   save () {
@@ -89,6 +97,14 @@ export class PersonComponent implements OnInit {
     }else{
       FormUtil.validateFormFields(this.formPerson);
     }
+  }
+  
+  hasErrors(formControl : FormControl){
+    return FormUtil.hasErrors(formControl);
+  } 
+
+  hasError(formControl : FormControl, error?:string){
+    return FormUtil.hasError(formControl,error);
   } 
 
 }

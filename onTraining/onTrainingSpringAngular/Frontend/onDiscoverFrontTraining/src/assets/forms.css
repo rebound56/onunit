@@ -1,7 +1,22 @@
-.ng-valid[required], .ng-valid.required  {
-    border-left: 5px solid #42A948; /* green */
-  }
-  
-  .ng-invalid:not(form)  {
-    border-left: 5px solid #a94442; /* red */
-  }
+.form-control.ng-invalid  {
+  border-left: .30rem solid #a94442;
+  padding-left: .45rem;
+}
+
+.form-control-label{
+  margin-bottom:.1rem;
+}
+.form-control-feedback{
+  margin-top:.1rem;
+  min-height:24px;
+}
+.form-control-feedback small{
+  vertical-align: top;
+}
+.form-group.has-error .form-control-feedback{
+  color: #a94442;
+}
+.form-group{
+  margin-bottom: 0.5rem;
+}
+

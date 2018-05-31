@@ -11,4 +11,12 @@ export class FormUtil {
             }
         });
     }
+    static hasErrors(formControl : FormControl){
+        return formControl.errors && (formControl.dirty || formControl.touched);
+    } 
+
+    static hasError(formControl : FormControl, error?:string){
+        return FormUtil.hasErrors(formControl) && formControl.errors[error];
+    } 
+    
 }
