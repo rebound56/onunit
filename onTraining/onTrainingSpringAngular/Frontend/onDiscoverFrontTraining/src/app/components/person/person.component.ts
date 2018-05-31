@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Person } from '../../models/person';
 import { CustomValidator } from '../../utils/custom-validator';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { FormUtil } from '../../utils/form-util';
 
 
 @Component({
@@ -68,7 +69,7 @@ export class PersonComponent implements OnInit {
     this.controlGender = new FormControl(this.person.gender,[
       Validators.required        
     ]);
-    this.controlMatchNumberDocument= new FormControl(this.person.numberDocument,[
+    this.controlMatchNumberDocument= new FormControl('',[
       CustomValidator.match(this.controlNumberDocument)       
     ]);
 
@@ -83,7 +84,11 @@ export class PersonComponent implements OnInit {
   }
 
   save () {
-    console.log("save")
+    if(this.formPerson.valid){
+      alert("Saved!");
+    }else{
+      FormUtil.validateFormFields(this.formPerson);
+    }
   } 
 
 }

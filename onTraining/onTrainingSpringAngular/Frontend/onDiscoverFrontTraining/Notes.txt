@@ -159,3 +159,28 @@
                 </div>
             </div>
         </form>    
+7) Trigger validators on submit
+    - Create  classs called utils/FormUtil
+        >ng generate class utils/FormUtil
+    - in utils/form-util.ts 
+        import { FormGroup, FormControl } from '@angular/forms';
+        export class FormUtil {
+            static validateFormFields(formGroup: FormGroup){
+                Object.keys(formGroup.controls).forEach(field => {
+                    var control = formGroup.get(field);
+                    if(control instanceof FormControl){
+                        control.markAsTouched({onlySelf:true});
+                    }else if (control instanceof FormGroup){
+                        FormUtil.validateFormFields(control);
+                    }
+                });
+            }
+        }
+    - in person.component.ts
+        save () {
+            if(this.formPerson.valid){
+            alert("Saved!");
+            }else{
+            FormUtil.validateFormFields(this.formPerson);
+            }
+        } 
