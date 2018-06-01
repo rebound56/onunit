@@ -183,4 +183,51 @@
             }else{
             FormUtil.validateFormFields(this.formPerson);
             }
+        }
+
+8) Handle validation errors
+    - In utils/form.util.ts I created two static methods
+        /**
+        * It allows to validate if a formcontrol has errors
+        * @param formControl 
+        */
+        static hasErrors(formControl : FormControl){
+            return formControl.errors && (formControl.dirty || formControl.touched);
         } 
+
+        /**
+        * It allows to validate if a formcontrol has a specific error
+        * @param formControl 
+        * @param error 
+        */
+        static hasError(formControl : FormControl, error?:string){
+            return FormUtil.hasErrors(formControl) && formControl.errors[error];
+        } 
+
+    - In person.component.ts create methods to handle validators errors
+        hasErrors(formControl : FormControl){
+            return FormUtil.hasErrors(formControl);
+        } 
+
+        hasError(formControl : FormControl, error?:string){
+            return FormUtil.hasError(formControl,error);
+        } 
+
+    - In person.component.html implement the methods
+        <div class="col-md-3">
+            <div class="form-group" [ngClass]="{'has-error': hasErrors(controlNumberDocument)}">      
+                <label for="numberDocument" class="form-control-label">Number of document</label>
+                <input type="text" class="form-control" name="numberDocument" placeholder="Number of document" formControlName="controlNumberDocument" [(ngModel)]="person.numberDocument" (keyup)="controlMatchNumberDocument.updateValueAndValidity()"/>
+                <div class="form-control-feedback">
+                    <small *ngIf="hasError(controlNumberDocument,'required')">Number of document is required</small>
+                    <small *ngIf="hasError(controlNumberDocument,'minlength')">Number of document must be greater than 3 characters long</small>
+                    <small *ngIf="hasError(controlNumberDocument,'maxlength')">Number of document must be lesser than 200 characters long</small>            
+                </div> 
+            </div>
+        </div>
+9) Adding moment.js to handle dates
+    - Adding the moment.js to the project to handle dates
+        > npm install moment --save
+        
+
+
