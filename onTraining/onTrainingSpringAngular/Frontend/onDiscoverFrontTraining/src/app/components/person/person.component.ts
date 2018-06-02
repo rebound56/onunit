@@ -20,7 +20,7 @@ export class PersonComponent implements OnInit {
     numberDocument: '1234567',
     gender: '',
     birthdate: '1992-04-17',
-    issuedate: ''
+    issuedate: '1991-03-12'
   }
 
   genders : any ;
@@ -45,49 +45,8 @@ export class PersonComponent implements OnInit {
   }
 
   ngOnInit() {
-    // to add new validators
-    this.controlBirthdate = new FormControl(this.person.birthdate,[
-      Validators.required,
-      Validators.nullValidator,
-      CustomValidator.maxdate(this.controlIssuedate)
-    ]);
-    this.controlIssuedate = new FormControl(this.person.issuedate,[
-      Validators.required,
-      Validators.nullValidator,
-      CustomValidator.mindate(this.controlBirthdate)
-    ]);
-
-    this.controlName = new FormControl(this.person.name,[
-      Validators.required,
-      Validators.minLength(3),
-      Validators.maxLength(150)
-    ]);
-    this.controlLastName = new FormControl(this.person.lastName,[
-      Validators.required,
-      Validators.minLength(3),
-      Validators.maxLength(200)
-    ]);
-    this.controlEmail = new FormControl(this.person.email,[
-      Validators.required,
-      Validators.minLength(4),
-      Validators.maxLength(150),
-      Validators.email
-    ]);
-    this.controlNumberDocument = new FormControl(this.person.numberDocument,[
-      Validators.required,
-      Validators.minLength(3),
-      Validators.maxLength(20),
-      
-    ]);
-   
-
-    this.controlGender = new FormControl(this.person.gender,[
-      Validators.required        
-    ]);
-    this.controlMatchNumberDocument= new FormControl('',[
-      CustomValidator.match(this.controlNumberDocument)       
-    ]);
-
+        
+    this.initControls();
     this.formPerson = new FormGroup({
       controlName:this.controlName,
       controlLastName:this.controlLastName,
@@ -98,6 +57,56 @@ export class PersonComponent implements OnInit {
       controlBirthdate:this.controlBirthdate,
       controlIssuedate:this.controlIssuedate
     })    
+  }
+
+  initControls(){
+    // initializing every control
+    this.controlName = new FormControl(this.person.name);
+    this.controlLastName = new FormControl(this.person.lastName);
+    this.controlEmail = new FormControl(this.person.email);
+    this.controlNumberDocument = new FormControl(this.person.numberDocument);
+    this.controlGender = new FormControl(this.person.gender);
+    this.controlMatchNumberDocument= new FormControl('');
+    this.controlIssuedate = new FormControl(this.person.issuedate);
+    this.controlBirthdate = new FormControl(this.person.birthdate);    
+    // setting validators
+    this.controlName.setValidators([ 
+      Validators.required,
+      Validators.minLength(3),
+      Validators.maxLength(150)
+    ]);
+    this.controlLastName.setValidators([ 
+      Validators.required,
+      Validators.minLength(3),
+      Validators.maxLength(200)
+    ]);
+    this.controlEmail.setValidators([ 
+      Validators.required,
+      Validators.minLength(4),
+      Validators.maxLength(150),
+      Validators.email
+    ]);
+    this.controlNumberDocument.setValidators([ 
+      Validators.required,
+      Validators.minLength(3),
+      Validators.maxLength(20),      
+    ]);
+    this.controlGender.setValidators([ 
+      Validators.required        
+    ]);
+    this.controlMatchNumberDocument.setValidators([
+      CustomValidator.match(this.controlNumberDocument)       
+    ]);
+    this.controlIssuedate.setValidators([
+      Validators.required,
+      Validators.nullValidator,
+      CustomValidator.mindate(this.controlBirthdate)
+    ]);
+    this.controlBirthdate.setValidators([
+      Validators.required,
+      Validators.nullValidator,
+      CustomValidator.maxdate(this.controlIssuedate)     
+    ]);
   }
 
   save () {

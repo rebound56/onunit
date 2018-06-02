@@ -76,7 +76,7 @@
     <div class="col-md-4">
       <div class="form-group" [ngClass]="{'has-error': hasErrors(controlBirthdate)}">
         <label for="birthdate" class="form-control-label">Birthdate</label>
-        <input type="date" name="birthdate" placeholder="Birthdate" formControlName="controlBirthdate" class="form-control" [(ngModel)]="person.birthdate" />         
+        <input type="date" name="birthdate" placeholder="Birthdate" formControlName="controlBirthdate" class="form-control" [(ngModel)]="person.birthdate" (keyup)="controlIssuedate.updateValueAndValidity()" />         
         <div class="form-control-feedback">
           <small *ngIf="hasError(controlBirthdate,'required')">Birthdate is required</small>
           <small *ngIf="hasError(controlBirthdate,'nullValidator')">Birthdate must not be null</small>
@@ -87,12 +87,12 @@
 
     <div class="col-md-4">
       <div class="form-group" [ngClass]="{'has-error': hasErrors(controlIssuedate)}">
-        <label for="issuedate" class="form-control-label">Issuedate</label>
-        <input type="date" name="issuedate" placeholder="Issuedate" formControlName="controlIssuedate" class="form-control" [(ngModel)]="person.issuedate" />         
+        <label for="issuedate" class="form-control-label">Issue date</label>
+        <input type="date" name="issuedate" placeholder="Issue date" formControlName="controlIssuedate" class="form-control" [(ngModel)]="person.issuedate" (keyup)="controlBirthdate.updateValueAndValidity()" />         
         <div class="form-control-feedback">
-          <small *ngIf="hasError(controlIssuedate,'required')">Issuedate is required</small>
-          <small *ngIf="hasError(controlIssuedate,'nullValidator')">Birthdate must not be null</small>
-          <small *ngIf="hasError(controlIssuedate,'mindate')">Issuedate must be older than birthdate</small>
+          <small *ngIf="hasError(controlIssuedate,'required')">Issue date is required</small>
+          <small *ngIf="hasError(controlIssuedate,'nullValidator')">Issue date must not be null</small>
+          <small *ngIf="hasError(controlIssuedate,'mindate')">Issue date must be older than birthdate</small>
         </div>
       </div>
     </div>
