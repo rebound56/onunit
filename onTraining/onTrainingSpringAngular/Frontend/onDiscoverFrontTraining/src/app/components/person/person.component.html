@@ -1,116 +1,108 @@
-<h1>Person</h1>
+<div class="jumbotron">
+  <h1>Person</h1>
 
-<form [formGroup]="formPerson"  (ngSubmit)="save()" >
-  <div class="row">
-    <div class="col-md-6">
-      <div class="form-group" [ngClass]="{'has-error': hasErrors(controlName)}">     
-          <label for="name" class="form-control-label">Name</label>
-          <input type="text" class="form-control" name="name" placeholder="Name" formControlName="controlName" [(ngModel)]="person.name" />
+  <form [formGroup]="formPerson"  (ngSubmit)="save()" >
+    <div class="row">
+      <div class="col-md-6">
+        <div class="form-group" [ngClass]="{'has-error': hasErrors(controlName)}">     
+            <label for="name" class="form-control-label">Name</label>
+            <input type="text" class="form-control" name="name" placeholder="Name" formControlName="controlName" [(ngModel)]="person.name" />
+            <div class="form-control-feedback">
+                <small *ngIf="hasError(controlName,'required')">Name is required</small>
+                <small *ngIf="hasError(controlName,'minlength')">Name must be greater than 3 characters long</small>
+                <small *ngIf="hasError(controlName,'maxlength')">Name must be lesser than 150 characters long</small>
+            </div>      
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="form-group" [ngClass]="{'has-error': hasErrors(controlLastName)}">      
+          <label for="lastName" class="form-control-label">Last name</label>
+          <input type="text" class="form-control" name="lastName" placeholder="Last name" formControlName="controlLastName" [(ngModel)]="person.lastName" />
           <div class="form-control-feedback">
-              <small *ngIf="hasError(controlName,'required')">Name is required</small>
-              <small *ngIf="hasError(controlName,'minlength')">Name must be greater than 3 characters long</small>
-              <small *ngIf="hasError(controlName,'maxlength')">Name must be lesser than 150 characters long</small>
-          </div>      
-      </div>
-    </div>
-
-    <div class="col-md-6">
-      <div class="form-group" [ngClass]="{'has-error': hasErrors(controlLastName)}">      
-        <label for="lastName" class="form-control-label">Last name</label>
-        <input type="text" class="form-control" name="lastName" placeholder="Last name" formControlName="controlLastName" [(ngModel)]="person.lastName" />
-        <div class="form-control-feedback">
-            <small *ngIf="hasError(controlLastName,'required')">Last name is required</small>
-            <small *ngIf="hasError(controlLastName,'minlength')">Last name must be greater than 3 characters long</small>
-            <small *ngIf="hasError(controlLastName,'maxlength')">Last name must be lesser than 200 characters long</small>
-        </div> 
-      </div>
-    </div>
-
-    <div class="col-md-3">
-      <div class="form-group" [ngClass]="{'has-error': hasErrors(controlEmail)}">      
-        <label for="email" class="form-control-label">E-mail</label>
-        <input type="text" class="form-control" name="email" placeholder="E-mail" formControlName="controlEmail" [(ngModel)]="person.email" />
-        <div class="form-control-feedback">
-            <small *ngIf="hasError(controlEmail,'required')">E-mail is required</small>
-            <small *ngIf="hasError(controlEmail,'minlength')">E-mail must be greater than 3 characters long</small>
-            <small *ngIf="hasError(controlEmail,'maxlength')">E-mail must be lesser than 200 characters long</small>
-            <small *ngIf="hasError(controlEmail,'email')">E-mail is invalid</small>
-        </div> 
-      </div>
-    </div>
-
-    <div class="col-md-3">
-      <div class="form-group" [ngClass]="{'has-error': hasErrors(controlNumberDocument)}">      
-        <label for="numberDocument" class="form-control-label">Number of document</label>
-        <input type="text" class="form-control" name="numberDocument" placeholder="Number of document" formControlName="controlNumberDocument" [(ngModel)]="person.numberDocument" (keyup)="controlMatchNumberDocument.updateValueAndValidity()"/>
-        <div class="form-control-feedback">
-            <small *ngIf="hasError(controlNumberDocument,'required')">Number of document is required</small>
-            <small *ngIf="hasError(controlNumberDocument,'minlength')">Number of document must be greater than 3 characters long</small>
-            <small *ngIf="hasError(controlNumberDocument,'maxlength')">Number of document must be lesser than 200 characters long</small>            
-        </div> 
-      </div>
-    </div>
-
-    <div class="col-md-3">
-      <div class="form-group" [ngClass]="{'has-error': hasErrors(controlMatchNumberDocument)}">
-        <label for="matchNumberDocument" class="form-control-label">Confirm number of document</label>
-        <input type="text" name="matchNumberDocument" formControlName="controlMatchNumberDocument" placeholder="Confirm number of document" class="form-control"/>
-        <div class="form-control-feedback">
-          <small *ngIf="hasError(controlMatchNumberDocument,'match')">It must match with number document</small> 
+              <small *ngIf="hasError(controlLastName,'required')">Last name is required</small>
+              <small *ngIf="hasError(controlLastName,'minlength')">Last name must be greater than 3 characters long</small>
+              <small *ngIf="hasError(controlLastName,'maxlength')">Last name must be lesser than 200 characters long</small>
+          </div> 
         </div>
       </div>
-    </div>
 
-    <div class="col-md-2">
-      <div class="form-group" [ngClass]="{'has-error': hasErrors(controlGender)}">
-        <label for="gender" class="form-control-label">Gender</label>
-        <select name="gender" formControlName="controlGender" class="form-control" [(ngModel)]="person.gender">
-          <option *ngFor="let gender of genders" [value]="gender.value">{{gender.label}}</option>
-        </select>
-        <div class="form-control-feedback">
-          <small *ngIf="hasError(controlGender,'required')">Gender is required</small>
+      <div class="col-md-3">
+        <div class="form-group" [ngClass]="{'has-error': hasErrors(controlEmail)}">      
+          <label for="email" class="form-control-label">E-mail</label>
+          <input type="text" class="form-control" name="email" placeholder="E-mail" formControlName="controlEmail" [(ngModel)]="person.email" />
+          <div class="form-control-feedback">
+              <small *ngIf="hasError(controlEmail,'required')">E-mail is required</small>
+              <small *ngIf="hasError(controlEmail,'minlength')">E-mail must be greater than 3 characters long</small>
+              <small *ngIf="hasError(controlEmail,'maxlength')">E-mail must be lesser than 200 characters long</small>
+              <small *ngIf="hasError(controlEmail,'email')">E-mail is invalid</small>
+          </div> 
         </div>
       </div>
-    </div>
-    
-    <div class="col-md-4">
-      <div class="form-group" [ngClass]="{'has-error': hasErrors(controlBirthdate)}">
-        <label for="birthdate" class="form-control-label">Birthdate</label>
-        <input type="date" name="birthdate" placeholder="Birthdate" formControlName="controlBirthdate" class="form-control" [(ngModel)]="person.birthdate" (keyup)="controlIssuedate.updateValueAndValidity()" />         
-        <div class="form-control-feedback">
-          <small *ngIf="hasError(controlBirthdate,'required')">Birthdate is required</small>
-          <small *ngIf="hasError(controlBirthdate,'nullValidator')">Birthdate must not be null</small>
-          <small *ngIf="hasError(controlBirthdate,'maxdate')">Birthdate must be younger than issuedate</small>
+
+      <div class="col-md-3">
+        <div class="form-group" [ngClass]="{'has-error': hasErrors(controlNumberDocument)}">      
+          <label for="numberDocument" class="form-control-label">Number of document</label>
+          <input type="text" class="form-control" name="numberDocument" placeholder="Number of document" formControlName="controlNumberDocument" [(ngModel)]="person.numberDocument" (keyup)="controlMatchNumberDocument.updateValueAndValidity()"/>
+          <div class="form-control-feedback">
+              <small *ngIf="hasError(controlNumberDocument,'required')">Number of document is required</small>
+              <small *ngIf="hasError(controlNumberDocument,'minlength')">Number of document must be greater than 3 characters long</small>
+              <small *ngIf="hasError(controlNumberDocument,'maxlength')">Number of document must be lesser than 200 characters long</small>            
+          </div> 
         </div>
       </div>
-    </div>
 
-    <div class="col-md-4">
-      <div class="form-group" [ngClass]="{'has-error': hasErrors(controlIssuedate)}">
-        <label for="issuedate" class="form-control-label">Issue date</label>
-        <input type="date" name="issuedate" placeholder="Issue date" formControlName="controlIssuedate" class="form-control" [(ngModel)]="person.issuedate" (keyup)="controlBirthdate.updateValueAndValidity()" />         
-        <div class="form-control-feedback">
-          <small *ngIf="hasError(controlIssuedate,'required')">Issue date is required</small>
-          <small *ngIf="hasError(controlIssuedate,'nullValidator')">Issue date must not be null</small>
-          <small *ngIf="hasError(controlIssuedate,'mindate')">Issue date must be older than birthdate</small>
+      <div class="col-md-3">
+        <div class="form-group" [ngClass]="{'has-error': hasErrors(controlMatchNumberDocument)}">
+          <label for="matchNumberDocument" class="form-control-label">Confirm number of document</label>
+          <input type="text" name="matchNumberDocument" formControlName="controlMatchNumberDocument" placeholder="Confirm number of document" class="form-control"/>
+          <div class="form-control-feedback">
+            <small *ngIf="hasError(controlMatchNumberDocument,'match')">It must match with number document</small> 
+          </div>
         </div>
       </div>
-    </div>
 
-  </div>
-  <div class="row">
-    <div class="col-md-4">
-      <button type="submit" class="btn btn-success form-control">Save</button>
-    </div>
-  </div>
-  
-  <div class="row">
-    <div class="col-sm-12">
-      <p>Form value: {{formPerson.value | json}}</p>
-      <p>Form status: {{formPerson.status | json}}</p>
-      <p>Person: {{person | json}}</p>
-      <p>Form issue: {{controlBirthdate.errors | json}}</p>
-    </div>
-  </div>
+      <div class="col-md-2">
+        <div class="form-group" [ngClass]="{'has-error': hasErrors(controlGender)}">
+          <label for="gender" class="form-control-label">Gender</label>
+          <select name="gender" formControlName="controlGender" class="form-control" [(ngModel)]="person.gender">
+            <option *ngFor="let gender of genders" [value]="gender.value">{{gender.label}}</option>
+          </select>
+          <div class="form-control-feedback">
+            <small *ngIf="hasError(controlGender,'required')">Gender is required</small>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-4">
+        <div class="form-group" [ngClass]="{'has-error': hasErrors(controlBirthdate)}">
+          <label for="birthdate" class="form-control-label">Birthdate</label>
+          <input type="date" name="birthdate" placeholder="Birthdate" formControlName="controlBirthdate" class="form-control" [(ngModel)]="person.birthdate" (keyup)="controlIssuedate.updateValueAndValidity()" />         
+          <div class="form-control-feedback">
+            <small *ngIf="hasError(controlBirthdate,'required')">Birthdate is required</small>
+            <small *ngIf="hasError(controlBirthdate,'nullValidator')">Birthdate must not be null</small>
+            <small *ngIf="hasError(controlBirthdate,'maxdate')">Birthdate must be younger than issuedate</small>
+          </div>
+        </div>
+      </div>
 
-</form>
+      <div class="col-md-4">
+        <div class="form-group" [ngClass]="{'has-error': hasErrors(controlIssuedate)}">
+          <label for="issuedate" class="form-control-label">Issue date</label>
+          <input type="date" name="issuedate" placeholder="Issue date" formControlName="controlIssuedate" class="form-control" [(ngModel)]="person.issuedate" (keyup)="controlBirthdate.updateValueAndValidity()" />         
+          <div class="form-control-feedback">
+            <small *ngIf="hasError(controlIssuedate,'required')">Issue date is required</small>
+            <small *ngIf="hasError(controlIssuedate,'nullValidator')">Issue date must not be null</small>
+            <small *ngIf="hasError(controlIssuedate,'mindate')">Issue date must be older than birthdate</small>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="row">
+      <div class="col-md-4">
+        <button type="submit" class="btn btn-success form-control">Save</button>
+      </div>
+    </div>
+  </form>
+</div>
