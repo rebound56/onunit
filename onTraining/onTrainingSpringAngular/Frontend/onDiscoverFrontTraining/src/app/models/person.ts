@@ -7,4 +7,6 @@ export class Person {
     gender: string; 
     birthDate: string;
     issueDate: string;
+    createdAt: string;
+    modifiedAt: string;
 }

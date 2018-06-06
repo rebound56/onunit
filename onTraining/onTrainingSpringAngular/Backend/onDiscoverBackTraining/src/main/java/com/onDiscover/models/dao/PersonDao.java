@@ -35,4 +35,12 @@ public class PersonDao implements IPersonDao {
 
 	}
 
+	@Override
+	public Person findById(Long id) {
+		if(id != null) {
+			return em.find(Person.class, id);
+		}
+		return null;
+	}
+
 }

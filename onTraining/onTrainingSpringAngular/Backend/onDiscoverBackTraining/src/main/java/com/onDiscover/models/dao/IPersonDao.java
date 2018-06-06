@@ -12,6 +12,12 @@ public interface IPersonDao {
 	public List<Person> findAll();
 	
 	/**
+	 * It returns a person by id
+	 * @return
+	 */
+	public Person findById(Long id);
+	
+	/**
 	 * It saves a person
 	 * @param person
 	 */

@@ -3,6 +3,8 @@ import { Person } from '../../models/person';
 import { CustomValidator } from '../../utils/custom-validator';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { FormUtil } from '../../utils/form-util';
+import { ActivatedRoute } from '@angular/router';
+
 
 
 @Component({
@@ -11,20 +13,11 @@ import { FormUtil } from '../../utils/form-util';
   styleUrls: ['./person.component.css']
 })
 export class PersonComponent implements OnInit {
-
-  person : Person = {
-    id:1,
-    name:'Mauro',
-    lastName: 'German',
-    email: 'mauro.german@ondiscover.com',
-    numberDocument: '1234567',
-    gender: '',
-    birthDate: '1992-04-17',
-    issueDate: '1991-03-12'
-  }
-
-  genders : any ;
-
+  // person
+  person : Person;
+  // lists
+  genders : any ;  
+  // form
   formPerson: FormGroup;
   controlName: FormControl;
   controlLastName: FormControl;
@@ -36,7 +29,19 @@ export class PersonComponent implements OnInit {
   controlIssueDate: FormControl;
   
 
-  constructor() {
+  constructor(private route : ActivatedRoute) {
+  }
+
+  ngOnInit() {
+    this.initPerson();     
+    this.initForm();
+    this.initLists();
+
+    
+  }
+
+  /** It initializes the lists of the component */
+  initLists(){
     this.genders = [
       {value: '', label: '-- Select option'},
       {value: 'M', label: 'Male'},
@@ -44,22 +49,19 @@ export class PersonComponent implements OnInit {
     ]
   }
 
-  ngOnInit() {
-        
-    this.initControls();
-    this.formPerson = new FormGroup({
-      controlName:this.controlName,
-      controlLastName:this.controlLastName,
-      controlEmail:this.controlEmail,
-      controlNumberDocument:this.controlNumberDocument,
-      controlMatchNumberDocument: this.controlMatchNumberDocument,
-      controlGender:this.controlGender,
-      controlBirthDate:this.controlBirthDate,
-      controlIssueDate:this.controlIssueDate
-    })    
+  /** It initializes the person */
+  initPerson(){
+    let id = this.route.snapshot.params["id"];
+    if(id != undefined){
+      this.person = new Person();
+    }else{
+      this.person = new Person();
+    }
   }
 
-  initControls(){
+
+  /** It initializes the form */
+  initForm(){
     // initializing every control
     this.controlName = new FormControl(this.person.name);
     this.controlLastName = new FormControl(this.person.lastName);
@@ -107,6 +109,17 @@ export class PersonComponent implements OnInit {
       Validators.nullValidator,
       CustomValidator.maxdate(this.controlIssueDate)     
     ]);
+    // add controls to form
+    this.formPerson = new FormGroup({
+      controlName:this.controlName,
+      controlLastName:this.controlLastName,
+      controlEmail:this.controlEmail,
+      controlNumberDocument:this.controlNumberDocument,
+      controlMatchNumberDocument: this.controlMatchNumberDocument,
+      controlGender:this.controlGender,
+      controlBirthDate:this.controlBirthDate,
+      controlIssueDate:this.controlIssueDate
+    })    
   }
 
   save () {
