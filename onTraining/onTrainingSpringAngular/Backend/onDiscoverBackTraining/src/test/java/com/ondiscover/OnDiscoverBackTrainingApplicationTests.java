@@ -1,4 +1,4 @@
-package com.ondiscover;
+package com.onDiscover;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

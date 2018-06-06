@@ -1,0 +1,2 @@
+INSERT INTO person (id, name, last_name, email, number_document, gender, birth_date, issue_date, created_at, modified_at) VALUES (1, 'Julian', 'Parra', 'julian.m.parra@gmail.com', '1234567890', 'M', '1992-04-17', '2010-05-10', '2016-09-02', '2017-01-02');
+INSERT INTO person (id, name, last_name, email, number_document, gender, birth_date, issue_date, created_at, modified_at) VALUES (2, 'Mauricio', 'Montenegro', 'mauro.rebound.56@gmail.com', '0987654321', 'M', '1993-06-11', '2011-09-19', '2017-03-01', '2018-03-02');

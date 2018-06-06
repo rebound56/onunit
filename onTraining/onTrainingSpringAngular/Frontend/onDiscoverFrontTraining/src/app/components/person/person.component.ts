@@ -19,8 +19,8 @@ export class PersonComponent implements OnInit {
     email: 'mauro.german@ondiscover.com',
     numberDocument: '1234567',
     gender: '',
-    birthdate: '1992-04-17',
-    issuedate: '1991-03-12'
+    birthDate: '1992-04-17',
+    issueDate: '1991-03-12'
   }
 
   genders : any ;
@@ -32,8 +32,8 @@ export class PersonComponent implements OnInit {
   controlNumberDocument: FormControl;
   controlMatchNumberDocument: FormControl;
   controlGender: FormControl;
-  controlBirthdate: FormControl;
-  controlIssuedate: FormControl;
+  controlBirthDate: FormControl;
+  controlIssueDate: FormControl;
   
 
   constructor() {
@@ -54,8 +54,8 @@ export class PersonComponent implements OnInit {
       controlNumberDocument:this.controlNumberDocument,
       controlMatchNumberDocument: this.controlMatchNumberDocument,
       controlGender:this.controlGender,
-      controlBirthdate:this.controlBirthdate,
-      controlIssuedate:this.controlIssuedate
+      controlBirthDate:this.controlBirthDate,
+      controlIssueDate:this.controlIssueDate
     })    
   }
 
@@ -67,8 +67,8 @@ export class PersonComponent implements OnInit {
     this.controlNumberDocument = new FormControl(this.person.numberDocument);
     this.controlGender = new FormControl(this.person.gender);
     this.controlMatchNumberDocument= new FormControl('');
-    this.controlIssuedate = new FormControl(this.person.issuedate);
-    this.controlBirthdate = new FormControl(this.person.birthdate);    
+    this.controlIssueDate = new FormControl(this.person.issueDate);
+    this.controlBirthDate = new FormControl(this.person.birthDate);    
     // setting validators
     this.controlName.setValidators([ 
       Validators.required,
@@ -97,15 +97,15 @@ export class PersonComponent implements OnInit {
     this.controlMatchNumberDocument.setValidators([
       CustomValidator.match(this.controlNumberDocument)       
     ]);
-    this.controlIssuedate.setValidators([
+    this.controlIssueDate.setValidators([
       Validators.required,
       Validators.nullValidator,
-      CustomValidator.mindate(this.controlBirthdate)
+      CustomValidator.mindate(this.controlBirthDate)
     ]);
-    this.controlBirthdate.setValidators([
+    this.controlBirthDate.setValidators([
       Validators.required,
       Validators.nullValidator,
-      CustomValidator.maxdate(this.controlIssuedate)     
+      CustomValidator.maxdate(this.controlIssueDate)     
     ]);
   }
 
