@@ -141,7 +141,11 @@ export class PersonComponent implements OnInit {
 
   save () {
     if(this.formPerson.valid){
-      console.log(this.person)
+      this.personService.save(this.person).subscribe((result){
+        debugger;
+      }, (error) =>{
+        debugger;
+      })
     }else{
       FormUtil.validateFormFields(this.formPerson);
     }

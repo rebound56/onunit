@@ -27,7 +27,7 @@
         </div>
       </div>
 
-      <div class="col-md-3">
+      <div class="col-md-4">
         <div class="form-group" [ngClass]="{'has-error': hasErrors(controlEmail)}">      
           <label for="email" class="form-control-label">E-mail</label>
           <input type="text" class="form-control" name="email" placeholder="E-mail" formControlName="controlEmail" [(ngModel)]="person.email" />
@@ -40,7 +40,7 @@
         </div>
       </div>
 
-      <div class="col-md-3">
+      <div class="col-md-4">
         <div class="form-group" [ngClass]="{'has-error': hasErrors(controlNumberDocument)}">      
           <label for="numberDocument" class="form-control-label">Number of document</label>
           <input type="text" class="form-control" name="numberDocument" placeholder="Number of document" formControlName="controlNumberDocument" [(ngModel)]="person.numberDocument" (keyup)="controlMatchNumberDocument.updateValueAndValidity()"/>
@@ -52,7 +52,7 @@
         </div>
       </div>
 
-      <div class="col-md-3">
+      <div class="col-md-4">
         <div class="form-group" [ngClass]="{'has-error': hasErrors(controlMatchNumberDocument)}">
           <label for="matchNumberDocument" class="form-control-label">Confirm number of document</label>
           <input type="text" name="matchNumberDocument" formControlName="controlMatchNumberDocument" placeholder="Confirm number of document" class="form-control"/>
@@ -62,7 +62,7 @@
         </div>
       </div>
 
-      <div class="col-md-2">
+      <div class="col-md-4">
         <div class="form-group" [ngClass]="{'has-error': hasErrors(controlGender)}">
           <label for="gender" class="form-control-label">Gender</label>
           <select name="gender" formControlName="controlGender" class="form-control" [(ngModel)]="person.gender">
@@ -77,7 +77,7 @@
       <div class="col-md-4">
         <div class="form-group" [ngClass]="{'has-error': hasErrors(controlBirthDate)}">
           <label for="birthDate" class="form-control-label">Birth date</label>
-          <input type="date" name="birthDate" placeholder="Birth date" formControlName="controlBirthDate" class="form-control" [(ngModel)]="person.birthDate" (keyup)="controlIssueDate.updateValueAndValidity()" />         
+          <input type="date" name="birthDate" placeholder="Birth date" formControlName="controlBirthDate" class="form-control" [(ngModel)]="person.birthDate" (change)="controlIssueDate.updateValueAndValidity()" />         
           <div class="form-control-feedback">
             <small *ngIf="hasError(controlBirthDate,'required')">Birth date is required</small>
             <small *ngIf="hasError(controlBirthDate,'nullValidator')">Birth date must not be null</small>
@@ -89,7 +89,7 @@
       <div class="col-md-4">
         <div class="form-group" [ngClass]="{'has-error': hasErrors(controlIssueDate)}">
           <label for="issueDate" class="form-control-label">Issue date</label>
-          <input type="date" name="issueDate" placeholder="Issue date" formControlName="controlIssueDate" class="form-control" [(ngModel)]="person.issueDate" (keyup)="controlBirthDate.updateValueAndValidity()" />         
+          <input type="date" name="issueDate" placeholder="Issue date" formControlName="controlIssueDate" class="form-control" [(ngModel)]="person.issueDate" (change)="controlBirthDate.updateValueAndValidity()" />         
           <div class="form-control-feedback">
             <small *ngIf="hasError(controlIssueDate,'required')">Issue date is required</small>
             <small *ngIf="hasError(controlIssueDate,'nullValidator')">Issue date must not be null</small>
@@ -100,8 +100,12 @@
 
     </div>
     <div class="row">
-      <div class="col-md-4">
+      <div class="col-md-9">&nbsp;</div>
+      <div class="col-md-2">
         <button type="submit" class="btn btn-success form-control">Save</button>
+      </div>
+      <div class="col-md-1 text-align-left">
+        <a routerLink="/person">Cancelar</a>
       </div>
     </div>
   </form>
