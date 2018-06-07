@@ -1,13 +1,10 @@
 import { ValidatorFn, ValidationErrors } from "@angular/forms/src/directives/validators";
 import { AbstractControl, FormControl } from "@angular/forms/src/model";
-import { FormUtil } from "./form-util";
+import { DateUtil } from "./date-util";
 
 export class CustomValidator {
 
-    /**
-     * It allows to validate if a formcontrol value matches with another one
-     * @param controlToCompare 
-     */
+    /** It validates if a formcontrol value matches with another one */
     static match(controlToCompare :FormControl) : ValidatorFn {
         return (control : AbstractControl): {[key: string]: boolean} => {
             if(control.value === controlToCompare.value){
@@ -17,17 +14,14 @@ export class CustomValidator {
         }
     }
 
-    /**
-     * It allows to validate if the control date value must be older than controlToCompare 
-     * @param controlToCompare 
-     */
+    /** It validates if the control date value is older than another one */
     static mindate(controlToCompare :FormControl) : ValidatorFn {
         return (control : AbstractControl): {[key: string]: boolean} => {            
             if(controlToCompare != null && controlToCompare != undefined){
                 let value = control.value;            
                 let valueToCompare = controlToCompare.value;            
-                let date = FormUtil.getDate(value);
-                let dateToCompare = FormUtil.getDate(valueToCompare);
+                let date = DateUtil.getDate(value);
+                let dateToCompare = DateUtil.getDate(valueToCompare);
 
                 if(date != null && dateToCompare != null)
                     if(date.getTime() < dateToCompare.getTime())
@@ -38,17 +32,14 @@ export class CustomValidator {
         }
     }
 
-    /**
-     * It allows to validate if the control date value must be younger than controlToCompare 
-     * @param controlToCompare 
-     */
+    /** It validates if the control date value is younger than another one */
     static maxdate(controlToCompare :FormControl) : ValidatorFn {
         return (control : AbstractControl): {[key: string]: boolean} => {   
             if(controlToCompare != null && controlToCompare != undefined){         
                 let value = control.value;
                 let valueToCompare = controlToCompare.value;            
-                let date = FormUtil.getDate(value);
-                let dateToCompare = FormUtil.getDate(valueToCompare);
+                let date = DateUtil.getDate(value);
+                let dateToCompare = DateUtil.getDate(valueToCompare);
 
                 if(date != null && dateToCompare != null)
                     if(date.getTime() > dateToCompare.getTime())

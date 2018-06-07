@@ -13,9 +13,13 @@ import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 @Entity
-@Table(name="person")
+@Table(name = "person")
 public class Person implements Serializable {
 	/**
 	 * 
@@ -28,26 +32,38 @@ public class Person implements Serializable {
 	private Long id;
 
 	@Column(name = "name")
+	@NotEmpty
+	@Size(max = 150)
 	private String name;
 
 	@Column(name = "last_name")
+	@NotEmpty
+	@Size(max = 200)
 	private String lastName;
 
 	@Column(name = "email")
+	@NotEmpty
+	@Size(max = 150)
+	@Email
 	private String email;
 
 	@Column(name = "number_document")
+	@Size(max = 20, min = 3)
+	@NotEmpty
 	private String numberDocument;
 
 	@Column(name = "gender")
+	@NotEmpty
 	private String gender;
 
 	@Column(name = "birth_date")
 	@Temporal(TemporalType.DATE)
+	@NotNull
 	private Date birthDate;
 
 	@Column(name = "issue_date")
 	@Temporal(TemporalType.DATE)
+	@NotNull
 	private Date issueDate;
 
 	@Column(name = "created_at")
@@ -61,18 +77,50 @@ public class Person implements Serializable {
 	public Person() {
 		super();
 	}
-	
-	
 
-	public Person(Long id, String name, String lastName) {
-		super();
-		this.id = id;
-		this.name = name;
-		this.lastName = lastName;
+	@PrePersist
+	public void prePersist() {
+		this.createdAt = new Date();
+		this.modifiedAt = new Date();
 	}
 
+	@PreUpdate
+	public void preUpdate() {
+		this.modifiedAt = new Date();
+	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		return result;
+	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Person other = (Person) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "Person [id=" + id + ", name=" + name + ", lastName=" + lastName + ", email=" + email
+				+ ", numberDocument=" + numberDocument + ", gender=" + gender + ", birthDate=" + birthDate
+				+ ", issueDate=" + issueDate + ", createdAt=" + createdAt + ", modifiedAt=" + modifiedAt + "]";
+	}
+	
 	public Long getId() {
 		return id;
 	}
@@ -152,50 +200,4 @@ public class Person implements Serializable {
 	public void setModifiedAt(Date modifiedAt) {
 		this.modifiedAt = modifiedAt;
 	}
-	
-	@PrePersist
-	public void prePersist() {
-		this.createdAt = new Date();
-		this.modifiedAt = new Date();
-	}
-	
-	@PreUpdate
-	public void preUpdate() {
-		this.modifiedAt = new Date();
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Person other = (Person) obj;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		return true;
-	}
-
-	@Override
-	public String toString() {
-		return "Person [id=" + id + ", name=" + name + ", lastName=" + lastName + ", email=" + email
-				+ ", numberDocument=" + numberDocument + ", gender=" + gender + ", birthDate=" + birthDate
-				+ ", issueDate=" + issueDate + ", createdAt=" + createdAt + ", modifiedAt=" + modifiedAt + "]";
-	}
-	
-	
-
 }

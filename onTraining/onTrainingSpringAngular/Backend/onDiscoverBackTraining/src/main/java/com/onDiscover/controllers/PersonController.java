@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.onDiscover.models.dao.IPersonDao;
+import com.onDiscover.models.daos.IPersonDao;
 import com.onDiscover.models.entities.Person;
 
 @Controller
@@ -23,7 +23,6 @@ public class PersonController {
 	private IPersonDao personDao;
 
 	@GetMapping(value = "/")
-	@CrossOrigin(origins="http://localhost:4200")
 	public ResponseEntity<List<Person>> findAll() {
 		List<Person> list = personDao.findAll();
 		return new ResponseEntity<List<Person>>(list, HttpStatus.OK);

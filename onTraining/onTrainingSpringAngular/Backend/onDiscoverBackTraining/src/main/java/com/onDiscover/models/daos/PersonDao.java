@@ -1,4 +1,4 @@
-package com.onDiscover.models.dao;
+package com.onDiscover.models.daos;
 
 import java.util.List;
 

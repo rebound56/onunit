@@ -4,6 +4,8 @@ import { CustomValidator } from '../../utils/custom-validator';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { FormUtil } from '../../utils/form-util';
 import { ActivatedRoute } from '@angular/router';
+import { PersonService } from '../../services/person.service';
+import { NumberUtil } from '../../utils/number-util';
 
 
 
@@ -15,8 +17,13 @@ import { ActivatedRoute } from '@angular/router';
 export class PersonComponent implements OnInit {
   // person
   person : Person;
+
   // lists
   genders : any ;  
+
+  // boolean identifies if form is prepared
+  formPrepared: boolean = false;
+
   // form
   formPerson: FormGroup;
   controlName: FormControl;
@@ -29,15 +36,11 @@ export class PersonComponent implements OnInit {
   controlIssueDate: FormControl;
   
 
-  constructor(private route : ActivatedRoute) {
-  }
+  constructor(private route : ActivatedRoute, private personService : PersonService) {}
 
-  ngOnInit() {
-    this.initPerson();     
-    this.initForm();
+  ngOnInit() {    
     this.initLists();
-
-    
+    this.initPerson();
   }
 
   /** It initializes the lists of the component */
@@ -53,15 +56,30 @@ export class PersonComponent implements OnInit {
   initPerson(){
     let id = this.route.snapshot.params["id"];
     if(id != undefined){
-      this.person = new Person();
+      if(NumberUtil.isNumber(id)){
+        this.personService.get(id).subscribe((result :Person )=>{
+          // the service has been succesful        
+          this.initForm(result);        
+        }, (error) => {
+           // the service has failed
+           debugger;
+          console.log("error: ", error);
+        });
+      }else{
+        // id is not numeric
+        debugger;
+      }
     }else{
-      this.person = new Person();
+      // id doesn't exist
+      this.initForm(new Person());    
     }
   }
 
 
   /** It initializes the form */
-  initForm(){
+  initForm(person : Person){
+    // initializes the person
+    this.person = person;
     // initializing every control
     this.controlName = new FormControl(this.person.name);
     this.controlLastName = new FormControl(this.person.lastName);
@@ -73,18 +91,15 @@ export class PersonComponent implements OnInit {
     this.controlBirthDate = new FormControl(this.person.birthDate);    
     // setting validators
     this.controlName.setValidators([ 
-      Validators.required,
-      Validators.minLength(3),
+      Validators.required,      
       Validators.maxLength(150)
     ]);
     this.controlLastName.setValidators([ 
-      Validators.required,
-      Validators.minLength(3),
+      Validators.required,      
       Validators.maxLength(200)
     ]);
     this.controlEmail.setValidators([ 
       Validators.required,
-      Validators.minLength(4),
       Validators.maxLength(150),
       Validators.email
     ]);
@@ -119,7 +134,9 @@ export class PersonComponent implements OnInit {
       controlGender:this.controlGender,
       controlBirthDate:this.controlBirthDate,
       controlIssueDate:this.controlIssueDate
-    })    
+    })   ;
+    // set form prepared as true
+    this.formPrepared = true; 
   }
 
   save () {

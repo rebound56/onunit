@@ -20,7 +20,6 @@ export class ListPersonComponent implements OnInit {
         }, 
         (error) => {
           console.log("ERROR "+error)          
-        });
+      });
   }
-
 }

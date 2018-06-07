@@ -228,6 +228,210 @@
 9) Adding moment.js to handle dates
     - Adding the moment.js to the project to handle dates
         > npm install moment --save
-        
 
+10) Adding service to get person information with onDiscoverBack
+    - I executed the command
+        >ng g s services/person
+    - In app.module.ts , I decided to add in Providers the service and import the HttpClientModule to use for making request by http
+        ...
+        import { PersonService } from './services/person.service';
+        import { HttpClientModule } from '@angular/common/http';
+        ...
+        @NgModule({
+        ...
+        imports: [
+            ...
+            HttpClientModule
+        ],
+        providers: [
+            PersonService
+        ],
+        ...
+        })
+        export class AppModule { }
+
+    - In services/person.service.ts
+        import { Injectable } from '@angular/core';
+        import {HttpClient} from '@angular/common/http';
+        @Injectable()
+        export class PersonService {
+            constructor(private http : HttpClient){ }  
+            getListPerson(){
+            return this.http.get('http://localhost:8080/person/');
+            }
+        }
+    - In components/list-person.component.ts
+        import { Component, OnInit } from '@angular/core';
+        import { PersonService } from '../../services/person.service';
+
+        @Component({
+        selector: 'app-list-person',
+        templateUrl: './list-person.component.html',
+        styleUrls: ['./list-person.component.css']
+        })
+        export class ListPersonComponent implements OnInit {
+        listPerson : any;
+            constructor(private personService: PersonService) {}
+            ngOnInit() {
+                this.listPerson = [];
+                this.personService.getListPerson()
+                .subscribe(
+                    (result)=>{
+                    this.listPerson = result;
+                    }, 
+                    (error) => {
+                    console.log("ERROR "+error)          
+                });
+            }
+        }    
+    - In components/list-person.component.html
+         <div class="jumbotron">
+            <h1>List person</h1>
+            <div class="table-responsive">
+                <table class="table table-striped table-dark table-bordered table-hover table-sm">
+                <thead class="thead-dark">
+                    <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Last name</th>
+                    <th scope="col">Number document</th>
+                    <th scope="col">E-mail</th>
+                    <th scope="col">Birth date</th>
+                    <th scope="col">Issue date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let person of listPerson">
+                        <td scope="row">{{person.name}}</td>
+                        <td scope="row">{{person.lastName}}</td>
+                        <td scope="row">{{person.numberDocument}}</td>
+                        <td scope="row">{{person.email}}</td>
+                        <td scope="row">{{person.birthDate}}</td>
+                        <td scope="row">{{person.issueDate}}</td>
+                    </tr>
+                </tbody>
+                </table>
+            </div>
+        </div>
+9) Load person information to the page
+    - In person.service.ts
+        import { Injectable } from '@angular/core';
+        import {HttpClient} from '@angular/common/http';
+        @Injectable()
+        export class PersonService {
+            constructor(private http : HttpClient){ }  
+            /** It returns a list of person */
+            getListPerson(){
+            return this.http.get('http://localhost:8080/person/');
+            }
+            /** It returns a specific person */
+            get(id :number){
+            return this.http.get('http://localhost:8080/person/'+id);
+            }
+        }
+    - In person.component.ts , I had to create a boolean variable to show the form when it is prepared so:
+        ...
+        export class PersonComponent implements OnInit {
+            ...
+            // boolean identifies if form is prepared
+            formPrepared: boolean = false;    
+            ...
+            constructor(private route : ActivatedRoute, private personService : PersonService) {}
+
+            ngOnInit() {    
+                this.initLists();
+                this.initPerson();
+            }
+
+            /** It initializes the person */
+            initPerson(){
+                let id = this.route.snapshot.params["id"];
+                if(id != undefined){
+                if(NumberUtil.isNumber(id)){
+                    this.personService.get(id).subscribe((result :Person )=>{
+                    // the service has been succesful        
+                    this.initForm(result);        
+                    }, (error) => {
+                    // the service has failed
+                    debugger;
+                    console.log("error: ", error);
+                    });
+                }else{
+                    // id is not numeric
+                    debugger;
+                }
+                }else{
+                // id doesn't exist
+                this.initForm(new Person());    
+                }
+            }
+
+
+            /** It initializes the form */
+            initForm(person : Person){
+                // initializes the person
+                this.person = person;
+                // initializing every control
+                this.controlName = new FormControl(this.person.name);
+                this.controlLastName = new FormControl(this.person.lastName);
+                this.controlEmail = new FormControl(this.person.email);
+                this.controlNumberDocument = new FormControl(this.person.numberDocument);
+                this.controlGender = new FormControl(this.person.gender);
+                this.controlMatchNumberDocument= new FormControl('');
+                this.controlIssueDate = new FormControl(this.person.issueDate);
+                this.controlBirthDate = new FormControl(this.person.birthDate);    
+                // setting validators
+                this.controlName.setValidators([ 
+                Validators.required,      
+                Validators.maxLength(150)
+                ]);
+                this.controlLastName.setValidators([ 
+                Validators.required,      
+                Validators.maxLength(200)
+                ]);
+                this.controlEmail.setValidators([ 
+                Validators.required,
+                Validators.maxLength(150),
+                Validators.email
+                ]);
+                this.controlNumberDocument.setValidators([ 
+                Validators.required,
+                Validators.minLength(3),
+                Validators.maxLength(20),      
+                ]);
+                this.controlGender.setValidators([ 
+                Validators.required        
+                ]);
+                this.controlMatchNumberDocument.setValidators([
+                CustomValidator.match(this.controlNumberDocument)       
+                ]);
+                this.controlIssueDate.setValidators([
+                Validators.required,
+                Validators.nullValidator,
+                CustomValidator.mindate(this.controlBirthDate)
+                ]);
+                this.controlBirthDate.setValidators([
+                Validators.required,
+                Validators.nullValidator,
+                CustomValidator.maxdate(this.controlIssueDate)     
+                ]);
+                // add controls to form
+                this.formPerson = new FormGroup({
+                controlName:this.controlName,
+                controlLastName:this.controlLastName,
+                controlEmail:this.controlEmail,
+                controlNumberDocument:this.controlNumberDocument,
+                controlMatchNumberDocument: this.controlMatchNumberDocument,
+                controlGender:this.controlGender,
+                controlBirthDate:this.controlBirthDate,
+                controlIssueDate:this.controlIssueDate
+                })   ;
+                // set form prepared as true
+                this.formPrepared = true; 
+            }
+    - In person.component.html
+        <div class="jumbotron">
+        <h1>Person</h1>
+        <form [formGroup]="formPerson"  (ngSubmit)="save()" *ngIf="formPrepared">
+            ...
+        </form>
 

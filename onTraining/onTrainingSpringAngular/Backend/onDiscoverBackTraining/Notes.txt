@@ -1,0 +1,279 @@
+1) Create project
+    - File > new >Spring strater project 
+        - We select tools like JPA - WEB - H2 - MySQL
+2) Create a entity
+    - Create a package
+        com.onDiscover.models.entities
+    - Create an entity 
+        package com.onDiscover.models.entities;
+
+        import java.io.Serializable;
+        import java.util.Date;
+
+        import javax.persistence.Column;
+        import javax.persistence.Entity;
+        import javax.persistence.GeneratedValue;
+        import javax.persistence.GenerationType;
+        import javax.persistence.Id;
+        import javax.persistence.PrePersist;
+        import javax.persistence.PreUpdate;
+        import javax.persistence.Table;
+        import javax.persistence.Temporal;
+        import javax.persistence.TemporalType;
+        import javax.validation.constraints.Email;
+        import javax.validation.constraints.NotEmpty;
+        import javax.validation.constraints.NotNull;
+        import javax.validation.constraints.Size;
+
+        @Entity
+        @Table(name = "person")
+        public class Person implements Serializable {
+            /**
+            * 
+            */
+            private static final long serialVersionUID = 1L;
+
+            @Id
+            @GeneratedValue(strategy = GenerationType.IDENTITY)
+            @Column(name = "id")
+            private Long id;
+
+            @Column(name = "name")
+            @NotEmpty
+            @Size(max = 150)
+            private String name;
+
+            @Column(name = "last_name")
+            @NotEmpty
+            @Size(max = 200)
+            private String lastName;
+
+            @Column(name = "email")
+            @NotEmpty
+            @Size(max = 150)
+            @Email
+            private String email;
+
+            @Column(name = "number_document")
+            @Size(max = 20, min = 3)
+            @NotEmpty
+            private String numberDocument;
+
+            @Column(name = "gender")
+            @NotEmpty
+            private String gender;
+
+            @Column(name = "birth_date")
+            @Temporal(TemporalType.DATE)
+            @NotNull
+            private Date birthDate;
+
+            @Column(name = "issue_date")
+            @Temporal(TemporalType.DATE)
+            @NotNull
+            private Date issueDate;
+
+            @Column(name = "created_at")
+            @Temporal(TemporalType.DATE)
+            private Date createdAt;
+
+            @Column(name = "modified_at")
+            @Temporal(TemporalType.DATE)
+            private Date modifiedAt;
+
+            public Person() {
+                super();
+            }
+
+            @PrePersist
+            public void prePersist() {
+                this.createdAt = new Date();
+                this.modifiedAt = new Date();
+            }
+
+            @PreUpdate
+            public void preUpdate() {
+                this.modifiedAt = new Date();
+            }
+
+            @Override
+            public int hashCode() {
+                final int prime = 31;
+                int result = 1;
+                result = prime * result + ((id == null) ? 0 : id.hashCode());
+                return result;
+            }
+
+            @Override
+            public boolean equals(Object obj) {
+                if (this == obj)
+                    return true;
+                if (obj == null)
+                    return false;
+                if (getClass() != obj.getClass())
+                    return false;
+                Person other = (Person) obj;
+                if (id == null) {
+                    if (other.id != null)
+                        return false;
+                } else if (!id.equals(other.id))
+                    return false;
+                return true;
+            }
+
+            @Override
+            public String toString() {
+                return "Person [id=" + id + ", name=" + name + ", lastName=" + lastName + ", email=" + email
+                        + ", numberDocument=" + numberDocument + ", gender=" + gender + ", birthDate=" + birthDate
+                        + ", issueDate=" + issueDate + ", createdAt=" + createdAt + ", modifiedAt=" + modifiedAt + "]";
+            }
+
+            // getters and setters
+        }
+
+3) Generando Daos para el manejo de transacciones
+    - se crea un paquete para Daos
+        com.onDiscover.models.daos
+    - se crea interfaz del dao llamada IPersonDao
+        package com.onDiscover.models.dao;
+        import java.util.List;
+        import com.onDiscover.models.entities.Person;
+
+        public interface IPersonDao {
+            /**
+            * It returns all list of person
+            * @return
+            */
+            public List<Person> findAll();
+            
+            /**
+            * It returns a person by id
+            * @return
+            */
+            public Person findById(Long id);
+            
+            /**
+            * It saves a person
+            * @param person
+            */
+            public void save(Person person);
+        }
+    - Se crea una clase que implemente el dao llamado PersonDao
+        package com.onDiscover.models.dao;
+
+        import java.util.List;
+
+        import javax.persistence.EntityManager;
+        import javax.persistence.PersistenceContext;
+
+        import org.springframework.stereotype.Repository;
+        import org.springframework.transaction.annotation.Transactional;
+
+        import com.onDiscover.models.entities.Person;
+
+        @Repository
+        public class PersonDao implements IPersonDao {
+
+            @PersistenceContext
+            private EntityManager em;
+
+            @SuppressWarnings("unchecked")
+            @Override
+            @Transactional(readOnly = true)
+            public List<Person> findAll() {
+                return em.createQuery("from Person p").getResultList();
+            }
+
+            @Override
+            @Transactional
+            public void save(Person person) {
+                if (person != null && person.getId() != null) {
+                    em.merge(person);
+                    return;
+                } 
+                em.persist(person);
+                
+
+            }
+
+            @Override
+            public Person findById(Long id) {
+                if(id != null) {
+                    return em.find(Person.class, id);
+                }
+                return null;
+            }
+
+        }
+4) Se crea controller para manejar el flujo
+    - se crea paquete para los controllers
+        com.onDiscover.controllers
+    - se crea clase controller llamada person controller
+        package com.onDiscover.controllers;
+        import java.util.List;
+
+        import org.springframework.beans.factory.annotation.Autowired;
+        import org.springframework.http.HttpStatus;
+        import org.springframework.http.ResponseEntity;
+        import org.springframework.stereotype.Controller;
+        import org.springframework.web.bind.annotation.CrossOrigin;
+        import org.springframework.web.bind.annotation.GetMapping;
+        import org.springframework.web.bind.annotation.PathVariable;
+        import org.springframework.web.bind.annotation.PostMapping;
+        import org.springframework.web.bind.annotation.RequestBody;
+        import org.springframework.web.bind.annotation.RequestMapping;
+
+        import com.onDiscover.models.dao.IPersonDao;
+        import com.onDiscover.models.entities.Person;
+
+        @Controller
+        @RequestMapping(value = "/person")
+        public class PersonController {
+            @Autowired
+            private IPersonDao personDao;
+
+            @GetMapping(value = "/")
+            @CrossOrigin(origins="http://localhost:4200")
+            public ResponseEntity<List<Person>> findAll() {
+                List<Person> list = personDao.findAll();
+                return new ResponseEntity<List<Person>>(list, HttpStatus.OK);
+            }
+
+            @GetMapping(value = "/{id}")
+            public ResponseEntity<?> findById(@PathVariable(name = "id") Long id) {
+                Person person = personDao.findById(id);
+                if (person != null) {
+                    return new ResponseEntity<Person>(person, HttpStatus.OK);
+                }
+                return new ResponseEntity(HttpStatus.NOT_FOUND);
+            }
+
+            @PostMapping(value = "/save")
+            public ResponseEntity<Person> save(@RequestBody Person input) {
+                personDao.save(input);
+                return new ResponseEntity<Person>(input, HttpStatus.OK);
+            }
+
+        }
+5) Configure cross origin for all project
+    - In com.onDiscover.OnDiscoverBackTrainingApplication
+        @SpringBootApplication
+        public class OnDiscoverBackTrainingApplication {
+
+            public static void main(String[] args) {
+                SpringApplication.run(OnDiscoverBackTrainingApplication.class, args);
+            }
+            
+            @Bean
+            public WebMvcConfigurer corsConfigure() {
+                return new WebMvcConfigurer() {
+                    @Override
+                    public void addCorsMappings(CorsRegistry registry) {
+                        registry.addMapping("/person/").allowedOrigins("http://localhost:4200");
+                        registry.addMapping("/person/{id}").allowedOrigins("http://localhost:4200");
+                    }			
+                };
+            }
+        }
+
+

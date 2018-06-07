@@ -5,8 +5,8 @@ import { ListPersonComponent } from '../../components/list-person/list-person.co
 
 
 const routes: Routes = [
-  { path: 'person/update/:id', component: PersonComponent },
-  { path: 'person/create', component: PersonComponent },
+  { path: 'person/form/:id', component: PersonComponent },
+  { path: 'person/form', component: PersonComponent },
   { path: 'person', component: ListPersonComponent }
 
 ];
