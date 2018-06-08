@@ -14,24 +14,24 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.onDiscover.error.ErrorMessage;
-import com.onDiscover.models.daos.IPersonDao;
 import com.onDiscover.models.entities.Person;
+import com.onDiscover.models.services.IPersonService;
 
 @Controller
 @RequestMapping(value = "/person")
 public class PersonController {
 	@Autowired
-	private IPersonDao personDao;
+	private IPersonService personService;
 
 	@GetMapping(value = "/get")
 	public ResponseEntity<List<Person>> findAll() {
-		List<Person> list = personDao.findAll();
+		List<Person> list = personService.findAll();
 		return new ResponseEntity<List<Person>>(list, HttpStatus.OK);
 	}
 
 	@GetMapping(value = "/get/{id}")
 	public ResponseEntity<?> findById(@PathVariable(name = "id") Long id) {
-		Person person = personDao.findById(id);
+		Person person = personService.findById(id);
 		if (person != null) {
 			return new ResponseEntity<Person>(person, HttpStatus.OK);
 		}
@@ -41,7 +41,7 @@ public class PersonController {
 	@PostMapping(value = "/save")
 	public ResponseEntity<?> save(@RequestBody Person input) {
 		try {
-			personDao.save(input);
+			personService.save(input);
 			return new ResponseEntity<Person>(input, HttpStatus.OK);
 		} catch (Exception ex) {
 			return new ResponseEntity<ErrorMessage>(
@@ -54,10 +54,10 @@ public class PersonController {
 	@DeleteMapping(value = "/delete/{id}")
 	public ResponseEntity delete(@PathVariable(name = "id") Long id) {
 		if (id != null) {
-			Person person = personDao.findById(id);
+			Person person = personService.findById(id);
 			if(person != null && person.getId() != null) {
 				try {
-					personDao.delete(person);
+					personService.delete(person);
 					return new ResponseEntity(HttpStatus.OK);
 				} catch (Exception ex) {
 					return new ResponseEntity<ErrorMessage>(

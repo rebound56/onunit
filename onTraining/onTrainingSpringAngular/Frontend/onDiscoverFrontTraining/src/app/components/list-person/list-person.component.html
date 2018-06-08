@@ -21,14 +21,14 @@
             <td scope="row">{{person.email}}</td>
             <td scope="row">{{person.birthDate}}</td>
             <td scope="row">{{person.issueDate}}</td>
-            <td scope="row"><button class="btn btn-primary" routerLink="/person/form/{{person.id}}">Edit</button></td>
-            <td scope="row"><button class="btn btn-danger" (click)="delete(person.id)">delete</button></td>
+            <td scope="row" class="text-align-right"><button class="btn btn-primary" routerLink="/person/form/{{person.id}}">Edit</button></td>
+            <td scope="row" class="text-align-right"><button class="btn btn-danger" (click)="delete(person.id)">Delete</button></td>
         </tr>
       </tbody>
       <tfoot>
         <tr>
           <td colspan="7"></td>
-          <td><button class="btn btn-success" routerLink="/person/form">Add</button></td>
+          <td class="text-align-right"><button class="btn btn-success" routerLink="/person/form">Add</button></td>
         </tr>
       </tfoot>
     </table>
