@@ -287,6 +287,20 @@
                         .timeZone(TimeZone.getDefault());
             }
         }
+7) Cross origins conflicts with delete
+    - By default only is allowed the methods GET and POST so we have to ensure that DELETE has to be on this list
+    - So in [Project]Application.java
+        @Bean
+        public WebMvcConfigurer corsConfigure() {
+            return new WebMvcConfigurer() {
+                @Override
+                public void addCorsMappings(CorsRegistry registry) {
+                    String angular_dev = "http://localhost:4200";
+                    registry.addMapping("/**").allowedOrigins(angular_dev).allowedMethods("GET", "POST", "DELETE");
+                }
+            };
+        }
+    
 
 
 

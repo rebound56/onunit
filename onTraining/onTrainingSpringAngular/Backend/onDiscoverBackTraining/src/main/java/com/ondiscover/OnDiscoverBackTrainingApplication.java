@@ -21,9 +21,8 @@ public class OnDiscoverBackTrainingApplication {
 		return new WebMvcConfigurer() {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
-				registry.addMapping("/person/").allowedOrigins("http://localhost:4200");
-				registry.addMapping("/person/{id}").allowedOrigins("http://localhost:4200");
-				registry.addMapping("/person/save").allowedOrigins("http://localhost:4200");
+				String angular_dev = "http://localhost:4200";
+				registry.addMapping("/**").allowedOrigins(angular_dev).allowedMethods("GET", "POST", "DELETE");
 			}
 		};
 	}

@@ -22,4 +22,10 @@ public interface IPersonDao {
 	 * @param person
 	 */
 	public void save(Person person);
+	
+	/**
+	 * It deletes a person
+	 * @param id
+	 */
+	public void delete(Person person);
 }

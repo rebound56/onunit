@@ -6,6 +6,7 @@ import { FormUtil } from '../../utils/form-util';
 import { ActivatedRoute } from '@angular/router';
 import { PersonService } from '../../services/person.service';
 import { NumberUtil } from '../../utils/number-util';
+import { Router } from '@angular/router/';
 
 
 
@@ -36,7 +37,7 @@ export class PersonComponent implements OnInit {
   controlIssueDate: FormControl;
   
 
-  constructor(private route : ActivatedRoute, private personService : PersonService) {}
+  constructor(private route : ActivatedRoute, private router : Router,  private personService : PersonService) {}
 
   ngOnInit() {    
     this.initLists();
@@ -61,23 +62,22 @@ export class PersonComponent implements OnInit {
           // the service has been succesful        
           this.initForm(result);        
         }, (error) => {
-           // the service has failed
-           debugger;
-          console.log("error: ", error);
+           // the service has failed            
+            console.log("error: ", error);
         });
       }else{
-        // id is not numeric
-        debugger;
+        alert('Id is incorrect')
       }
     }else{
       // id doesn't exist
       this.initForm(new Person());    
     }
   }
+ 
 
 
   /** It initializes the form */
-  initForm(person : Person){
+  initForm(person : Person){    
     // initializes the person
     this.person = person;
     // initializing every control
@@ -141,10 +141,11 @@ export class PersonComponent implements OnInit {
 
   save () {
     if(this.formPerson.valid){
-      this.personService.save(this.person).subscribe((result){
-        debugger;
+      this.personService.save(this.person).subscribe((result : any)=> {
+        alert("Person has been saved");
+        this.router.navigate(['/person/form/'+result.id]);
       }, (error) =>{
-        debugger;
+        alert("Error to try saving person")
       })
     }else{
       FormUtil.validateFormFields(this.formPerson);
