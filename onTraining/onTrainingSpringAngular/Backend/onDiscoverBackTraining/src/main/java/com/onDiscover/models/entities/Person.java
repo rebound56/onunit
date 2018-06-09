@@ -1,4 +1,4 @@
-package com.onDiscover.models.entities;
+package com.ondiscover.models.entities;
 
 import java.io.Serializable;
 import java.util.Date;

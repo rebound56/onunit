@@ -1,4 +1,4 @@
-package com.onDiscover.models.services;
+package com.ondiscover.models.services;
 
 import java.util.List;
 
@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.onDiscover.models.daos.IPersonDao;
-import com.onDiscover.models.entities.Person;
+import com.ondiscover.models.daos.IPersonDao;
+import com.ondiscover.models.entities.Person;
 
 @Service
 public class PersonService implements IPersonService {

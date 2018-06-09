@@ -435,3 +435,59 @@
             ...
         </form>
 
+10) http loader 
+    - execute
+        >npm install ng-http-loader@0.9.1 --save 
+    - in app.module
+        ..
+        import { NgHttpLoaderModule } from 'ng-http-loader/ng-http-loader.module';
+        ..
+        imports: [
+            ...
+            NgHttpLoaderModule
+        ],
+    - add spiner on app.component.html
+        <spinner></spinner>
+
+11) adding toaster
+    - execute
+        npm install angular5-toaster --save
+    - in angular-cli.json in style we add the style of toaster
+        "styles": [
+            "styles.css",
+            "assets/form.css",
+            "../node_modules/angular5-toaster/dist/toaster.css"
+        ],
+    - import toastermodule in app.module.ts
+        import {ToasterModule} from 'angular5-toaster';
+        import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+        ...
+        imports: [
+            ToasterModule,
+            BrowserAnimationsModule
+        ]
+    - add a tag html in app.component.html
+        <toaster-container></toaster-container>
+    - how to implement, in person.component.ts
+        ...
+        import {ToasterService} from 'angular5-toaster';
+        ...
+        constructor(.. private toasterService : ToasterService) {}
+        ...
+        /** It saves person */
+        save () {
+            if(this.formPerson.valid){
+            this.personService.save(this.person).subscribe((result : any)=> {
+                this.toasterService.pop('success', 'Person saved', 'The person has been saved succesful!');
+                this.router.navigate(['/person/form/'+result.id]);
+            }, (error) =>{
+                this.toasterService.pop('error', "Person did not save", 'The person has not been saved');
+            })
+            }else{
+                FormUtil.validateFormFields(this.formPerson);
+            }
+        }
+        
+
+
+    

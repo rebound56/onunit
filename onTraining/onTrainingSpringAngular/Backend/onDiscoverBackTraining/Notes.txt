@@ -452,7 +452,14 @@
         }
 
 9) Implement CRUDRepository
-    - Dao will extend CRUDRepository with the basic operations of crud
+    - interfaces Dao will extend CRUDRepository with the basic operations of crud
+    - we need to remove the class DAO implementation
+10) install MySQL
+    - we go to
+        https://dev.mysql.com/downloads/installer/
+    - we install mysqlserver and worbrench
+    
+
     
 
 

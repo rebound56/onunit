@@ -11,7 +11,9 @@ import {ReactiveFormsModule} from "@angular/forms";
 import { ListPersonComponent } from './components/list-person/list-person.component';
 import { PersonService } from './services/person.service';
 import { HttpClientModule } from '@angular/common/http';
-
+import { NgHttpLoaderModule } from 'ng-http-loader/ng-http-loader.module'
+import {ToasterModule} from 'angular5-toaster';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
@@ -24,7 +26,10 @@ import { HttpClientModule } from '@angular/common/http';
     AppRoutingModule,
     FormsModule,
     ReactiveFormsModule,
-    HttpClientModule
+    HttpClientModule,
+    NgHttpLoaderModule,
+    ToasterModule,
+    BrowserAnimationsModule
   ],
   providers: [
     PersonService

@@ -1,8 +1,8 @@
-package com.onDiscover.models.services;
+package com.ondiscover.models.services;
 
 import java.util.List;
 
-import com.onDiscover.models.entities.Person;
+import com.ondiscover.models.entities.Person;
 
 public interface IPersonService {
 	/**

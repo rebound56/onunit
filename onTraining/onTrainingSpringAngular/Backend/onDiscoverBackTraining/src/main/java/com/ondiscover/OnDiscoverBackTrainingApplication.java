@@ -1,4 +1,4 @@
-package com.onDiscover;
+package com.ondiscover;
 
 import java.util.TimeZone;
 
@@ -16,6 +16,10 @@ public class OnDiscoverBackTrainingApplication {
 		SpringApplication.run(OnDiscoverBackTrainingApplication.class, args);
 	}
 
+	/**
+	 * It defines de access cross origin
+	 * @return
+	 */
 	@Bean
 	public WebMvcConfigurer corsConfigure() {
 		return new WebMvcConfigurer() {
@@ -27,6 +31,10 @@ public class OnDiscoverBackTrainingApplication {
 		};
 	}
 
+	/**
+	 * It defines the timezone as default
+	 * @return
+	 */
 	@Bean
 	public Jackson2ObjectMapperBuilderCustomizer jackson2ObjectMapperBuilderCustomizer() {
 		return jackson2ObjectMapperBuilderCustomizer -> jackson2ObjectMapperBuilderCustomizer

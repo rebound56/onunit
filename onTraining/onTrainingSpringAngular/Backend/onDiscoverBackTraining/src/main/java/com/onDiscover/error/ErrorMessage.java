@@ -1,4 +1,4 @@
-package com.onDiscover.error;
+package com.ondiscover.error;
 
 public class ErrorMessage {
 	private String message;

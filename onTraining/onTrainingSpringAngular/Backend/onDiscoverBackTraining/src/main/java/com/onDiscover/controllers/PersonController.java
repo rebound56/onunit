@@ -1,4 +1,4 @@
-package com.onDiscover.controllers;
+package com.ondiscover.controllers;
 
 import java.util.List;
 
@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.onDiscover.error.ErrorMessage;
-import com.onDiscover.models.entities.Person;
-import com.onDiscover.models.services.IPersonService;
+import com.ondiscover.error.ErrorMessage;
+import com.ondiscover.models.entities.Person;
+import com.ondiscover.models.services.IPersonService;
 
 @Controller
 @RequestMapping(value = "/person")

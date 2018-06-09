@@ -7,7 +7,7 @@ import { ActivatedRoute } from '@angular/router';
 import { PersonService } from '../../services/person.service';
 import { NumberUtil } from '../../utils/number-util';
 import { Router } from '@angular/router/';
-
+import {ToasterService} from 'angular5-toaster';
 
 
 @Component({
@@ -37,7 +37,8 @@ export class PersonComponent implements OnInit {
   controlIssueDate: FormControl;
   
 
-  constructor(private route : ActivatedRoute, private router : Router,  private personService : PersonService) {}
+  constructor(private route : ActivatedRoute, private router : Router,
+      private personService : PersonService, private toasterService : ToasterService) {}
 
   ngOnInit() {    
     this.initLists();
@@ -62,11 +63,10 @@ export class PersonComponent implements OnInit {
           // the service has been succesful        
           this.initForm(result);        
         }, (error) => {
-           // the service has failed            
-            console.log("error: ", error);
+          this.toasterService.pop('error', "Error", 'Person has not been found');
         });
       }else{
-        alert('Id is incorrect')
+        this.toasterService.pop('error', "Error", 'Person has not been found');
       }
     }else{
       // id doesn't exist
@@ -138,14 +138,15 @@ export class PersonComponent implements OnInit {
     // set form prepared as true
     this.formPrepared = true; 
   }
-
+  
+  /** It saves person */
   save () {
     if(this.formPerson.valid){
       this.personService.save(this.person).subscribe((result : any)=> {
-        alert("Person has been saved");
+        this.toasterService.pop('success', 'Person saved', 'The person has been saved succesful!');
         this.router.navigate(['/person/form/'+result.id]);
       }, (error) =>{
-        alert("Error to try saving person")
+        this.toasterService.pop('error', "Person did not save", 'The person has not been saved');
       })
     }else{
       FormUtil.validateFormFields(this.formPerson);

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { PersonService } from '../../services/person.service';
+import {ToasterService} from 'angular5-toaster';
 
 @Component({
   selector: 'app-list-person',
@@ -8,7 +9,7 @@ import { PersonService } from '../../services/person.service';
 })
 export class ListPersonComponent implements OnInit {
   listPerson : any;
-  constructor(private personService: PersonService) { 
+  constructor(private personService: PersonService, private toasterService : ToasterService) { 
   }
 
   ngOnInit() {
@@ -23,7 +24,7 @@ export class ListPersonComponent implements OnInit {
         this.listPerson = result;
       }, 
       (error) => {
-        alert("Error to get persons");
+        this.toasterService.pop('error', "Error", 'It is not possible to load the list of person');
         console.log("ERROR "+error)          
     });
   }

@@ -21,8 +21,10 @@
     "@angular/platform-browser": "^5.2.0",
     "@angular/platform-browser-dynamic": "^5.2.0",
     "@angular/router": "^5.2.0",
+    "angular5-toaster": "^1.0.2",
     "core-js": "^2.4.1",
     "moment": "^2.22.2",
+    "ng-http-loader": "0.9.1",
     "rxjs": "^5.5.6",
     "zone.js": "^0.8.19"
   },
