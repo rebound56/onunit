@@ -1,6 +1,7 @@
 package com.ondiscover.controllers;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,11 +32,15 @@ public class PersonController {
 
 	@GetMapping(value = "/get/{id}")
 	public ResponseEntity<?> findById(@PathVariable(name = "id") Long id) {
-		Person person = personService.findById(id);
-		if (person != null) {
-			return new ResponseEntity<Person>(person, HttpStatus.OK);
+		try {
+			Person person = personService.findById(id);
+			if (person != null) {
+				return new ResponseEntity<Person>(person, HttpStatus.OK);
+			}
+			return new ResponseEntity(HttpStatus.NOT_FOUND);
+		} catch (NoSuchElementException ex) {
+			return new ResponseEntity(HttpStatus.NOT_FOUND);
 		}
-		return new ResponseEntity(HttpStatus.NOT_FOUND);
 	}
 
 	@PostMapping(value = "/save")
@@ -55,7 +60,7 @@ public class PersonController {
 	public ResponseEntity delete(@PathVariable(name = "id") Long id) {
 		if (id != null) {
 			Person person = personService.findById(id);
-			if(person != null && person.getId() != null) {
+			if (person != null && person.getId() != null) {
 				try {
 					personService.delete(person);
 					return new ResponseEntity(HttpStatus.OK);
@@ -64,9 +69,9 @@ public class PersonController {
 							new ErrorMessage("Error in some validations: " + ex.getLocalizedMessage()),
 							HttpStatus.INTERNAL_SERVER_ERROR);
 				}
-			}			
+			}
 		}
-		return new ResponseEntity(HttpStatus.NOT_FOUND);	
+		return new ResponseEntity(HttpStatus.NOT_FOUND);
 	}
 
 }

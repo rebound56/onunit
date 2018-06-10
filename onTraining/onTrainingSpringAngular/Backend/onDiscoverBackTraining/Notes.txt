@@ -457,7 +457,25 @@
 10) install MySQL
     - we go to
         https://dev.mysql.com/downloads/installer/
-    - we install mysqlserver and worbrench
+        Note:
+            - I had to install microsfot redistribute
+                https://www.microsoft.com/en-us/download/confirmation.aspx?id=48145
+            - I had to install .net installer
+                https://www.microsoft.com/en-us/download/confirmation.aspx?id=42642
+    - we install sql yog community
+        https://github.com/webyog/sqlyog-community/wiki/Downloads
+11) sql yog create database ondiscover
+    - we create database ondiscover
+12) Configuring spring project with the new datasource
+    - in application.properties
+        spring.datasource.url=jdbc:mysql://localhost/ondiscover?autoReconnect=true&useSSL=false
+        spring.datasource.username=root
+        spring.datasource.password=root
+        spring.datasource.driver-class-name=com.mysql.jdbc.Driver
+        spring.jpa.database-platform=org.hibernate.dialect.MySQL5Dialect
+        spring.jpa.hibernate.ddl-auto=create-drop
+        logging.level.org.hibernate.SQL=debug
+
     
 
     
