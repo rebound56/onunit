@@ -3,6 +3,8 @@ package com.ondiscover.models.services;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +21,13 @@ public class PersonService implements IPersonService {
 	public List<Person> findAll() {
 		return (List<Person>) personDao.findAll();
 	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public Page<Person> findAll(Pageable pageable) {
+		return personDao.findAll(pageable);
+	}
+
 
 	@Override
 	@Transactional(readOnly = true)
@@ -37,5 +46,6 @@ public class PersonService implements IPersonService {
 	public void delete(Person person) {
 		personDao.delete(person);
 	}
+
 
 }

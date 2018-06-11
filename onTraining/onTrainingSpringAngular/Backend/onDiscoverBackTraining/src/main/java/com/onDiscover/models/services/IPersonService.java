@@ -2,6 +2,8 @@ package com.ondiscover.models.services;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import com.ondiscover.models.entities.Person;
 
 public interface IPersonService {
@@ -10,6 +12,13 @@ public interface IPersonService {
 	 * @return
 	 */
 	public List<Person> findAll();
+	
+	/**
+	 * It returns Page<Person> depending on the variable pageable
+	 * @param pageable
+	 * @return
+	 */
+	public Page<Person> findAll(Pageable pageable);
 	
 	/**
 	 * It returns a person by id

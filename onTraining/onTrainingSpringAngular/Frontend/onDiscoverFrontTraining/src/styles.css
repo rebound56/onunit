@@ -1,1 +1,31 @@
 /* You can add global styles to this file, and also import other style files */
+.form-control.ng-invalid.ng-touched {
+    border-left: .30rem solid #a94442;
+    padding-left: .45rem;
+}
+
+.form-control-label{
+    margin-bottom:.1rem;
+}
+.form-control-feedback{
+    margin-top:.1rem;
+    min-height:24px;
+}
+.form-control-feedback small{
+    vertical-align: top;
+}
+.form-group.has-error .form-control-feedback{
+    color: #a94442;
+}
+.form-group{
+    margin-bottom: 0.5rem;
+}
+.text-align-right{
+    text-align: right;
+}
+.no-margin{
+    margin: 0;
+}
+.datatable-records{
+    margin-top:5px;
+}

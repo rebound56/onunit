@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import { Person } from '../models/person';
 import { HttpHeaders } from '@angular/common/http';
+import { Pageable } from '../models/pageable';
 @Injectable()
 export class PersonService {
     httpOptions : any = {headers: new HttpHeaders({'Content-Type': 'application/json'})};
@@ -9,8 +10,13 @@ export class PersonService {
     constructor(private http : HttpClient){ }  
 
     /** It returns a list of person */
-    getListPerson(){
-      return this.http.get('http://localhost:8080/person/get');
+    getListPerson(pageable : Pageable){
+      return this.http.get('http://localhost:8080/person/get', {
+        params: {
+          page: pageable.number.toString(),
+          size: pageable.size.toString()
+        }        
+      });
     }
     /** It returns a specific person */
     get(id :number){

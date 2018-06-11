@@ -8,6 +8,7 @@ import { PersonService } from '../../services/person.service';
 import { NumberUtil } from '../../utils/number-util';
 import { Router } from '@angular/router/';
 import {ToasterService} from 'angular5-toaster';
+import { HttpErrorResponse } from '@angular/common/http';
 
 
 @Component({
@@ -62,8 +63,13 @@ export class PersonComponent implements OnInit {
         this.personService.get(id).subscribe((result :Person )=>{
           // the service has been succesful        
           this.initForm(result);        
-        }, (error) => {
-          this.toasterService.pop('error', "Error", 'Person has not been found');
+        }, (error :HttpErrorResponse) => {
+          if(error.status == 404){
+            this.toasterService.pop('error', "Error", 'Person has not been found');
+          }else{
+            this.toasterService.pop('error', "Error", 'Error to try finding the person');
+          }
+          
         });
       }else{
         this.toasterService.pop('error', "Error", 'Person has not been found');

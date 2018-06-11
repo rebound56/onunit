@@ -475,8 +475,31 @@
         spring.jpa.database-platform=org.hibernate.dialect.MySQL5Dialect
         spring.jpa.hibernate.ddl-auto=create-drop
         logging.level.org.hibernate.SQL=debug
+13) Paginator
+    - In IPersonDao we are gonna extend from PagingAndSortingRepository and it inherances from CRUDRepository so we mantain the methods
+        public interface IPersonDao extends PagingAndSortingRepository<Person, Long> {
 
-    
+        }
+    - In IPersonService we create a method called findAll with a argument Pageable pageable
+        /**
+        * It returns Page<Person> depending on the variable pageable
+        * @param pageable
+        * @return
+        */
+        public Page<Person> findAll(Pageable pageable);
+    - In PersonService.java we implement the method
+        @Override
+        @Transactional(readOnly = true)
+        public Page<Person> findAll(Pageable pageable) {
+            return personDao.findAll(pageable);
+        }
+    - In PersonController.java
+        @GetMapping(value = "/get")
+        public ResponseEntity<Page<Person>> findAll(@RequestParam(name="page", defaultValue="0") int page) {
+            Pageable pageable = PageRequest.of(page, 5);
+            Page<Person> list = personService.findAll(pageable);
+            return new ResponseEntity<Page<Person>>(list, HttpStatus.OK);
+        }
 
     
 

@@ -24,7 +24,25 @@
         })
         export class AppRoutingModule { }
 
-5) Creating a form with standard validators
+5.1) Get bootstrap
+    - execute
+        npm install bootstrap@4.0.0 font-awesome@4.7.0
+    - in .angular-cli.json
+        {
+            "apps": [
+                {
+                "root": "src",
+                "styles": [
+                    "../node_modules/bootstrap/dist/css/bootstrap.min.css",
+                    "../node_modules/font-awesome/css/font-awesome.css",
+                    "styles.css"
+                ]
+                }
+            ]
+        }
+
+        
+5.2) Creating a form with standard validators
     - in person.component.ts
 
         import { Component, OnInit } from '@angular/core';
