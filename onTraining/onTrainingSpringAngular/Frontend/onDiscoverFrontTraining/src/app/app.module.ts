@@ -14,12 +14,14 @@ import { HttpClientModule } from '@angular/common/http';
 import { NgHttpLoaderModule } from 'ng-http-loader/ng-http-loader.module'
 import {ToasterModule} from 'angular5-toaster';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import { DatatableComponent } from './components/datatable/datatable.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     PersonComponent,
-    ListPersonComponent
+    ListPersonComponent,
+    DatatableComponent
   ],
   imports: [
     BrowserModule,
