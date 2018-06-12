@@ -28,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.ondiscover.error.ErrorMessage;
 import com.ondiscover.models.entities.Person;
 import com.ondiscover.models.services.IPersonService;
+import com.ondiscover.util.FileUtility;
 
 @Controller
 @RequestMapping(value = "/person")
@@ -78,24 +79,20 @@ public class PersonController {
 		}
 	}
 
-	@PostMapping(value = "/save/photo/{id}")
-	public ResponseEntity<?> savePhoto(@PathVariable(name = "id") Long id,
-			@RequestParam("photo") MultipartFile photo) {
+	@PostMapping(value = "/save/photo/{id}", headers = "Content-Type=multipart/form-data")
+	public ResponseEntity<?> savePhoto(@PathVariable(name = "id") Long id, @RequestParam("photo") MultipartFile photo) {
 		if (id == null)
 			return new ResponseEntity<ErrorMessage>(new ErrorMessage("Please set id"), HttpStatus.CONFLICT);
+		if (photo == null)
+			return new ResponseEntity<ErrorMessage>(new ErrorMessage("Please send file photo"), HttpStatus.CONFLICT);
 
 		try {
 			Person person = personService.findById(id);
 			if (person != null) {
 				try {
-					Path resourcesDirectory = Paths.get("src//main//resources//static//upload");
-					String absolutePath = resourcesDirectory.toFile().getAbsolutePath();
-					byte[] bytes = photo.getBytes();
-					StringBuilder strPathPhoto = new StringBuilder().append(absolutePath).append("//")
-							.append(photo.getOriginalFilename());
-					Path imageDirectory = Paths.get(strPathPhoto.toString());
-					Files.write(imageDirectory, bytes);
-					person.setPhoto(photo.getOriginalFilename());
+					String filename = FileUtility.generateRandomFileName(photo);
+					FileUtility.writeFile(filename, photo);
+					person.setPhoto(filename);
 					this.personService.save(person);
 					return new ResponseEntity<Object>(HttpStatus.OK);
 				} catch (IOException e) {

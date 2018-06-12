@@ -33,9 +33,7 @@ export class PersonService {
     savePhoto(id :number, photo: File){
       let formData: FormData = new FormData();
       formData.append('photo',photo);
-      return this.http.post('http://localhost:8080/person/save/photo/'+id,formData,
-        {headers: new HttpHeaders({'Content-Type': 'multipart/form-data'})}
-      );
+      return this.http.post('http://localhost:8080/person/save/photo/'+id,formData);
     }
 
 
