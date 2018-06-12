@@ -1,5 +1,9 @@
 package com.ondiscover.controllers;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
@@ -9,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,6 +23,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ondiscover.error.ErrorMessage;
 import com.ondiscover.models.entities.Person;
@@ -29,15 +35,15 @@ public class PersonController {
 	@Autowired
 	private IPersonService personService;
 
-	@GetMapping(value = "/get")
-	public ResponseEntity<Page<Person>> findAll(@RequestParam Map<String,String> mapRequest) {
+	@GetMapping(value = "/get/all")
+	public ResponseEntity<Page<Person>> findAll(@RequestParam Map<String, String> mapRequest) {
 		int page = 0;
-		int size= 5;
-		if(mapRequest != null && mapRequest.get("page")!=null && StringUtils.isNumber(mapRequest.get("page")))
-			page= Integer.parseInt(mapRequest.get("page"));
-		if(mapRequest != null && mapRequest.get("size")!=null && StringUtils.isNumber(mapRequest.get("size")))
-			size= Integer.parseInt(mapRequest.get("size"));
-		
+		int size = 5;
+		if (mapRequest != null && mapRequest.get("page") != null && StringUtils.isNumber(mapRequest.get("page")))
+			page = Integer.parseInt(mapRequest.get("page"));
+		if (mapRequest != null && mapRequest.get("size") != null && StringUtils.isNumber(mapRequest.get("size")))
+			size = Integer.parseInt(mapRequest.get("size"));
+
 		Pageable pageable = PageRequest.of(page, size);
 		Page<Person> list = personService.findAll(pageable);
 		return new ResponseEntity<Page<Person>>(list, HttpStatus.OK);
@@ -45,46 +51,85 @@ public class PersonController {
 
 	@GetMapping(value = "/get/{id}")
 	public ResponseEntity<?> findById(@PathVariable(name = "id") Long id) {
+		if (id == null)
+			return new ResponseEntity<ErrorMessage>(new ErrorMessage("Please set id"), HttpStatus.CONFLICT);
 		try {
 			Person person = personService.findById(id);
 			if (person != null) {
 				return new ResponseEntity<Person>(person, HttpStatus.OK);
 			}
-			return new ResponseEntity(HttpStatus.NOT_FOUND);
+			return new ResponseEntity<ErrorMessage>(new ErrorMessage("Person not found"), HttpStatus.NOT_FOUND);
 		} catch (NoSuchElementException ex) {
-			return new ResponseEntity(HttpStatus.NOT_FOUND);
+			return new ResponseEntity<ErrorMessage>(new ErrorMessage("Person not found"), HttpStatus.NOT_FOUND);
 		}
 	}
 
 	@PostMapping(value = "/save")
-	public ResponseEntity<?> save(@RequestBody Person input) {
+	public ResponseEntity<?> save(@RequestBody Person person) {
+		if (person == null)
+			return new ResponseEntity<ErrorMessage>(new ErrorMessage("Please set person"), HttpStatus.CONFLICT);
 		try {
-			personService.save(input);
-			return new ResponseEntity<Person>(input, HttpStatus.OK);
+			personService.save(person);
+			return new ResponseEntity<Person>(person, HttpStatus.OK);
 		} catch (Exception ex) {
 			return new ResponseEntity<ErrorMessage>(
 					new ErrorMessage("Error in some validations: " + ex.getLocalizedMessage()),
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+	}
 
+	@PostMapping(value = "/save/photo/{id}")
+	public ResponseEntity<?> savePhoto(@PathVariable(name = "id") Long id,
+			@RequestParam("photo") MultipartFile photo) {
+		if (id == null)
+			return new ResponseEntity<ErrorMessage>(new ErrorMessage("Please set id"), HttpStatus.CONFLICT);
+
+		try {
+			Person person = personService.findById(id);
+			if (person != null) {
+				try {
+					Path resourcesDirectory = Paths.get("src//main//resources//static//upload");
+					String absolutePath = resourcesDirectory.toFile().getAbsolutePath();
+					byte[] bytes = photo.getBytes();
+					StringBuilder strPathPhoto = new StringBuilder().append(absolutePath).append("//")
+							.append(photo.getOriginalFilename());
+					Path imageDirectory = Paths.get(strPathPhoto.toString());
+					Files.write(imageDirectory, bytes);
+					person.setPhoto(photo.getOriginalFilename());
+					this.personService.save(person);
+					return new ResponseEntity<Object>(HttpStatus.OK);
+				} catch (IOException e) {
+					return new ResponseEntity<ErrorMessage>(new ErrorMessage("Error trying to upload image"),
+							HttpStatus.INTERNAL_SERVER_ERROR);
+				}
+			}
+			return new ResponseEntity<ErrorMessage>(new ErrorMessage("Person not found"), HttpStatus.NOT_FOUND);
+		} catch (NoSuchElementException ex) {
+			return new ResponseEntity<ErrorMessage>(new ErrorMessage("Person not found"), HttpStatus.NOT_FOUND);
+		}
 	}
 
 	@DeleteMapping(value = "/delete/{id}")
-	public ResponseEntity delete(@PathVariable(name = "id") Long id) {
-		if (id != null) {
+	public ResponseEntity<?> delete(@PathVariable(name = "id") Long id) {
+		if (id == null)
+			return new ResponseEntity<ErrorMessage>(new ErrorMessage("Please set id"), HttpStatus.CONFLICT);
+		try {
 			Person person = personService.findById(id);
-			if (person != null && person.getId() != null) {
+			if (person != null) {
 				try {
 					personService.delete(person);
-					return new ResponseEntity(HttpStatus.OK);
+					return new ResponseEntity<Object>(HttpStatus.OK);
 				} catch (Exception ex) {
 					return new ResponseEntity<ErrorMessage>(
 							new ErrorMessage("Error in some validations: " + ex.getLocalizedMessage()),
 							HttpStatus.INTERNAL_SERVER_ERROR);
 				}
 			}
+			return new ResponseEntity<ErrorMessage>(new ErrorMessage("Person not found"), HttpStatus.NOT_FOUND);
+		} catch (NoSuchElementException ex) {
+			return new ResponseEntity<ErrorMessage>(new ErrorMessage("Person not found"), HttpStatus.NOT_FOUND);
 		}
-		return new ResponseEntity(HttpStatus.NOT_FOUND);
+
 	}
 
 }

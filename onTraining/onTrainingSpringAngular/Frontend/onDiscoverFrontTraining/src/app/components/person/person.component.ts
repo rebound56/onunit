@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Person } from '../../models/person';
 import { CustomValidator } from '../../utils/custom-validator';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
@@ -36,8 +36,10 @@ export class PersonComponent implements OnInit {
   controlGender: FormControl;
   controlBirthDate: FormControl;
   controlIssueDate: FormControl;
-  
 
+  // form-data for image
+  @ViewChild('photoInput') photoInput;
+  
   constructor(private route : ActivatedRoute, private router : Router,
       private personService : PersonService, private toasterService : ToasterService) {}
 
@@ -95,6 +97,8 @@ export class PersonComponent implements OnInit {
     this.controlMatchNumberDocument= new FormControl('');
     this.controlIssueDate = new FormControl(this.person.issueDate);
     this.controlBirthDate = new FormControl(this.person.birthDate);    
+
+
     // setting validators
     this.controlName.setValidators([ 
       Validators.required,      
@@ -139,18 +143,39 @@ export class PersonComponent implements OnInit {
       controlMatchNumberDocument: this.controlMatchNumberDocument,
       controlGender:this.controlGender,
       controlBirthDate:this.controlBirthDate,
-      controlIssueDate:this.controlIssueDate
-    })   ;
+      controlIssueDate:this.controlIssueDate,
+
+    });
     // set form prepared as true
     this.formPrepared = true; 
   }
+
+  /** It returns formdate from photoInput */
+  getPhotoData() : File {
+    let fileBrowser = this.photoInput.nativeElement;
+    if (fileBrowser.files && fileBrowser.files[0]) {
+      return fileBrowser.files[0];      
+    }
+    return null;
+  }
+  
   
   /** It saves person */
-  save () {
+  save () {    
     if(this.formPerson.valid){
       this.personService.save(this.person).subscribe((result : any)=> {
-        this.toasterService.pop('success', 'Person saved', 'The person has been saved succesful!');
-        this.router.navigate(['/person/form/'+result.id]);
+        let photoData = this.getPhotoData();
+        if(photoData){
+          this.personService.savePhoto(result.id,photoData).subscribe((resultPhoto) => {
+            this.toasterService.pop('success', 'Person saved', 'The person and the photography have been saved succesful!');
+            this.router.navigate(['/person/form/'+result.id]);
+          }, (error)=>{
+            this.toasterService.pop('warning', 'Person saved', 'The person has been saved but the photography has not');            
+          });          
+        }else{
+          this.toasterService.pop('success', 'Person saved', 'The person has been saved succesful!');
+          this.router.navigate(['/person/form/'+result.id]);
+        }
       }, (error) =>{
         this.toasterService.pop('error', "Person did not save", 'The person has not been saved');
       })
@@ -166,5 +191,4 @@ export class PersonComponent implements OnInit {
   hasError(formControl : FormControl, error?:string){
     return FormUtil.hasError(formControl,error);
   } 
-
 }

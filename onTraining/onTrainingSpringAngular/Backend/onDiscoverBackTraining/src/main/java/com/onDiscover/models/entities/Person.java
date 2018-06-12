@@ -24,10 +24,11 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 @Entity
 @Table(name = "person")
 public class Person implements Serializable {
+
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -1287699149355418689L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,22 +38,26 @@ public class Person implements Serializable {
 	@Column(name = "name")
 	@NotEmpty
 	@Size(max = 150)
+	@NotNull
 	private String name;
 
 	@Column(name = "last_name")
 	@NotEmpty
 	@Size(max = 200)
+	@NotNull
 	private String lastName;
 
 	@Column(name = "email")
 	@NotEmpty
 	@Size(max = 150)
 	@Email
+	@NotNull
 	private String email;
 
 	@Column(name = "number_document")
 	@Size(max = 20, min = 3)
 	@NotEmpty
+	@NotNull
 	private String numberDocument;
 
 	@Column(name = "gender")
@@ -64,6 +69,8 @@ public class Person implements Serializable {
 	@NotNull
 	private Date birthDate;
 
+	private String photo;
+
 	@Column(name = "issue_date")
 	@Temporal(TemporalType.DATE)
 	@NotNull
@@ -71,10 +78,12 @@ public class Person implements Serializable {
 
 	@Column(name = "created_at")
 	@Temporal(TemporalType.DATE)
+	@NotNull
 	private Date createdAt;
 
 	@Column(name = "modified_at")
 	@Temporal(TemporalType.DATE)
+	@NotNull
 	private Date modifiedAt;
 
 	public Person() {
@@ -123,7 +132,7 @@ public class Person implements Serializable {
 				+ ", numberDocument=" + numberDocument + ", gender=" + gender + ", birthDate=" + birthDate
 				+ ", issueDate=" + issueDate + ", createdAt=" + createdAt + ", modifiedAt=" + modifiedAt + "]";
 	}
-	
+
 	public Long getId() {
 		return id;
 	}
@@ -203,4 +212,13 @@ public class Person implements Serializable {
 	public void setModifiedAt(Date modifiedAt) {
 		this.modifiedAt = modifiedAt;
 	}
+
+	public String getPhoto() {
+		return photo;
+	}
+
+	public void setPhoto(String photo) {
+		this.photo = photo;
+	}
+
 }

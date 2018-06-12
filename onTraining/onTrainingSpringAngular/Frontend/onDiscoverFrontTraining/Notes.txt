@@ -505,7 +505,284 @@
                 FormUtil.validateFormFields(this.formPerson);
             }
         }
+11) Pageable
+    - We create a class on models called Pageable, this classs will abstract the pageable object from spring
+    - It has attributes, methods that allows to manage the pageable and it has a EventEmitter that allows to send event when the datatable is changing
+        import {EventEmitter} from '@angular/core';
+
+        export class Pageable {
+            content : any;
+            pageable: any;
+            sort: any;
+            totalElements: number;
+            totalPages : number;
+            last : boolean;
+            size: number ;
+            numberOfElements : number;    
+            pageSize: number;   
+            first: boolean;
+            number: number;
+
+            listSize: any = [5,10,15,20,30];
+            listPages : any = [];
+
+            stateChanged: EventEmitter<boolean> = new EventEmitter();
+            
+            constructor(object : any){
+                if(object == undefined || object == null) object = {};
+                this.content = object['content'];
+                this.pageable = object['pageable'];
+                this.sort = object['sort'];
+                this.totalElements = object['totalElements'];
+                this.totalPages = object['totalPages'];
+                this.last = object['last'];
+                this.size = object['size'] != undefined ? object['size']: 5;
+                this.numberOfElements = object['numberOfElements'];
+                this.pageSize = object['pageSize'];
+                this.first = object['first'];
+                this.number = object['number'] != undefined ? object['number'] : 0 ;
+
+                if(this.totalPages != undefined){
+                    this.listPages = [];
+                    for(let i =0; i < this.totalPages; i++){
+                        let page = {
+                            index:i,
+                            label:i+1,
+                            active: i==this.number
+                        }
+                        this.listPages.push(page);
+                    }
+                }
+            }
+            
+            /** It returns a boolean when it is ready */
+            isReady(){
+                return this.totalElements != undefined && this.numberOfElements != undefined;
+            }
+            /** It returns a boolean to know if it has previous */
+            hasPrev(){
+                return this.number != undefined && this.number-1 >= 0;
+            }
+            /** It returns a boolean to know if it has next */
+            hasNext(){
+                return this.number != undefined && this.totalPages != undefined && this.number+1 < this.totalPages;
+            }
+            /** It returns if it is the first */
+            isFirst(){
+                return this.first != undefined && this.first;
+            }    
+            /** It returns if it is the first */
+            isLast(){
+                return this.last != undefined && this.last;
+            }
+
+            /** It returns the prev id */
+            getPrevIndex(){
+                return this.number != undefined ? this.number -1 : -1;
+            }
+
+            /** it returns the next id */
+            getNextIndex(){
+                return this.number != undefined ? this.number +1 : -1;
+            }
         
+            /**it returns the last id */
+            getLastIndex(){
+                return this.totalPages != undefined ? this.totalPages -1 : -1;
+            }
+
+            /**it returns the last id */
+            getFirstIndex(){
+                return 0;
+            }
+
+            /** it sets a new index and triggers the event when it is done */
+            setPage(index : number){
+                this.number=index;
+                this.emitEvent();    
+            }
+
+            /** it emits the event */
+            emitEvent(){
+                this.stateChanged.emit(true);
+            }
+
+            /** other methods can suscriber to listen new events */
+            onStateChanged() {
+                return this.stateChanged;
+            }    
+        }
+    - After we create a component called datatable that receive a pageable object and a title
+        - execute
+            >ng g c components/datatable
+        - in datatable.component.ts
+            import { Component, OnInit, Input } from '@angular/core';
+            import { Pageable } from '../../models/pageable';
+
+            @Component({
+            selector: 'app-datatable',
+            templateUrl: './datatable.component.html',
+            styleUrls: ['./datatable.component.css']
+            })
+            export class DatatableComponent implements OnInit {
+
+            @Input() pageable : Pageable;
+            @Input() title: string;
+            
+            constructor() { }
+
+            ngOnInit() {
+            }
+            }
+        - In datatable.component.html we create the html with the implementation of pageable
+            <div class="jumbotron" *ngIf="pageable.isReady()">
+                <div class="card ">
+                    <div class="card-header bg-dark text-white">
+                        <div class="row">
+                        <div class="col-9">
+                            <h3 class="no-margin">{{title}}</h3>
+                        </div>
+                        <div class="col-3 text-align-right">
+                            <div class="datatable-records">
+                            {{pageable.numberOfElements}}/{{pageable.totalElements}}
+                            </div>
+                        </div>
+                        </div>            
+                    </div>
+                    <div class="card-body">    
+                    <ng-content></ng-content>        
+                    </div> 
+                    <div class="card-footer">
+                    <div class="row">
+                        <div class="col-sm-3 col-md-1">
+                            <select class="form-control form-control-sm" [(ngModel)]="pageable.size" (change)="pageable.setPage(pageable.getFirstIndex())">
+                                <option *ngFor="let size of pageable.listSize" [value]="size">{{size}}</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-9 col-md-11">
+                        <nav>
+                            <ul class="pagination pagination-sm justify-content-end">
+                                <li class="page-item" [ngClass]="{'disabled': pageable.isFirst()}">
+                                <a class="page-link" *ngIf="!pageable.isFirst()" (click)="pageable.setPage(pageable.getFirstIndex())" >First</a>
+                                <span class="page-link" *ngIf="pageable.isFirst()">First</span>
+                                </li>
+                                <li class="page-item" [ngClass]="{'disabled': !pageable.hasPrev()}">
+                                    <a class="page-link" *ngIf="pageable.hasPrev()" (click)="pageable.setPage(pageable.getPrevIndex())" >Prev</a>
+                                    <span class="page-link" *ngIf="!pageable.hasPrev()">Prev</span>
+                                </li>
+                                <ng-container *ngFor="let page of pageable.listPages">
+                                    <li class="page-item" [ngClass]="{'active': page.active}">
+                                    <a class="page-link"  (click)="pageable.setPage(page.index)">{{page.label}}</a>
+                                    </li>
+                                </ng-container>                   
+                                <li class="page-item" [ngClass]="{'disabled': !pageable.hasNext()}">
+                                    <a class="page-link" *ngIf="pageable.hasNext()" (click)="pageable.setPage(pageable.getNextIndex())" >Next</a>
+                                    <span class="page-link" *ngIf="!pageable.hasNext()">Next</span>
+                                </li>
+                                <li class="page-item" [ngClass]="{'disabled': pageable.isLast()}">
+                                    <a class="page-link" *ngIf="!pageable.isLast()" (click)="pageable.setPage(pageable.getLastIndex())" >Last</a>
+                                    <span class="page-link" *ngIf="pageable.isLast()">Last</span>
+                                </li>
+                            </ul>
+                            </nav>
+                        </div>            
+                    </div>
+                    </div>
+                </div>
+        - In the implementation we send in datatable the content that will be implemented on <ng-content></ng-content>
+            <app-datatable [title]="'List of person'" [pageable]="pageable">
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered table-hover table-sm">
+                    <thead class="thead-dark">
+                        <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Last name</th>
+                        <th scope="col">Number document</th>
+                        <th scope="col">E-mail</th>
+                        <th scope="col">Birth date</th>
+                        <th scope="col">Issue date</th>
+                        <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let person of pageable.content">
+                        <td scope="row">{{person.name}}</td>
+                        <td scope="row">{{person.lastName}}</td>
+                        <td scope="row">{{person.numberDocument}}</td>
+                        <td scope="row">{{person.email}}</td>
+                        <td scope="row">{{person.birthDate}}</td>
+                        <td scope="row">{{person.issueDate}}</td>
+                        <td scope="row" class="text-align-right">
+                            <button class="btn btn-primary" routerLink="/person/form/{{person.id}}">
+                            <i class="fa fa-pencil-square-o"></i>
+                            </button>          
+                            <button class="btn btn-danger" (click)="delete(person.id)">
+                                <i class="fa fa fa-trash-o"></i>
+                            </button>
+                        </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                        <td colspan="6"></td>
+                        <td class="text-align-right"><button class="btn btn-success" routerLink="/person/form">Add</button></td>
+                        </tr>
+                    </tfoot>
+                    </table>
+                </div>
+            </app-datatable>
+        - Finally in list-person.component.html I decided to listen the event when the pageable has changed
+            export class ListPersonComponent implements OnInit {
+                pageable : Pageable;
+
+                constructor(private personService: PersonService, private toasterService : ToasterService) { 
+                    this.setPageable({});
+                }
+
+                ngOnInit() {    
+                    this.getList();
+                }
+                /** initializes pageable and suscribe the event when it has a change */
+                setPageable(object : any){
+                    this.pageable = new Pageable(object);
+                    this.pageable.onStateChanged().subscribe((data)=> {
+                    this.getList();
+                    })
+                }
+
+                /** it gets the list of person */
+                getList(){
+                    this.personService.getListPerson(this.pageable)
+                    .subscribe(
+                    (result : any)=>{
+                        this.setPageable(result);        
+                    }, 
+                    (error :HttpErrorResponse) => {        
+                        this.toasterService.pop('error', "Error", 'It is not possible to load the list of person');
+                        console.log("ERROR "+error)          
+                    });
+                }
+
+                /** It deletes a person */
+                delete(id :number){
+                    if(confirm('Are you sure you want to delete this person?')){
+                    this.personService.delete(id).subscribe((result) => {
+                        this.getList();
+                        alert("Person has been deleted");
+                    }, (error) => {
+                        alert("Error to try delete person");
+                        console.log("error: ", error);
+                    })
+                    }
+                }
+            }
+
+
+
+                
+
+
+
 
 
     
