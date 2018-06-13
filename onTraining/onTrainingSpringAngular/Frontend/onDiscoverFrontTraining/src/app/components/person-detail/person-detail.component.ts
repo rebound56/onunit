@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { NumberUtil } from '../../utils/number-util';
 import { Person } from '../../models/person';
 import { HttpResponse } from '@angular/common/http/src/response';
+import { ToasterService } from 'angular5-toaster';
 
 
 @Component({
@@ -20,7 +21,7 @@ export class PersonDetailComponent implements OnInit {
   /** This boolean variable determines if view is ready */
   ready: boolean = false;
 
-  constructor(private personService :PersonService, private route: ActivatedRoute) { }
+  constructor(private personService :PersonService, private route: ActivatedRoute, private toasterService : ToasterService) { }
 
   ngOnInit() {
     this.initPerson();
@@ -28,8 +29,7 @@ export class PersonDetailComponent implements OnInit {
 
   initPerson(){
     let id = this.route.snapshot.params["id"];
-    if(id != null){
-      if(NumberUtil.isNumber(id)){
+    if(id != null && NumberUtil.isNumber(id)){
         this.personService.get(id).subscribe((result :Person )=>{      
           this.person = result;
           this.ready=true;
@@ -42,21 +42,21 @@ export class PersonDetailComponent implements OnInit {
                 if(response.body){
                   reader.readAsDataURL(response.body);
                 }
-
-              }
-            
+              }            
           }, (error) => {
-            console.log(error)
+            
           });
-        }, (error) => {
-
+        }, (error: any) => {
+          if(error.status == 404){
+            this.toasterService.pop('error', 'Error', 'Person is not found');
+          }else{
+            this.toasterService.pop('error', 'Error', 'it was not possible to load the person');
+          }          
         });
       }else{
-
+        this.toasterService.pop('error', 'Error', 'ID person is incorrect');
       }
-    }else{
-
-    }
+   
   }
 
 }

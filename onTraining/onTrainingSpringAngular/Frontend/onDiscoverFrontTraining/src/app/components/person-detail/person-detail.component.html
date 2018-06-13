@@ -1,11 +1,11 @@
-<div class="card " *ngIf="ready">
+<div class="card ">
   <div class="card-header bg-dark text-white">
     <div class="row">
       <div class="col-sm-9">
         <h3 class="no-margin">Person detail</h3>
       </div>
       <div class="col-sm-3 text-align-right">
-        <button class="btn btn-default" routerLink="/person/form/{{person.id}}">
+        <button class="btn btn-default" routerLink="/person/form/{{person.id}}" *ngIf="person != undefined && person.id != undefined">
           <i class="fa fa-pencil-square-o"></i>
         </button>
         <button class="btn btn-default" routerLink="/person/list">
@@ -14,7 +14,7 @@
       </div>
     </div>
   </div>
-  <div class="card-body">    
+  <div class="card-body" *ngIf="ready">    
     <div class="row">
       <div class="col-md-5"  >
           <img [src]="photo" *ngIf="photo != undefined" alt="imagen"  class="img-thumbnail mx-auto d-block img-fluid">          
