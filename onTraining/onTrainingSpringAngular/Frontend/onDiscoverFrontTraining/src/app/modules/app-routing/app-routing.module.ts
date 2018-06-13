@@ -1,13 +1,15 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { PersonComponent} from '../../components/person/person.component';
-import { ListPersonComponent } from '../../components/list-person/list-person.component';
+import { PersonFormComponent } from '../../components/person-form/person-form.component';
+import { PersonListComponent } from '../../components/person-list/person-list.component';
+import { PersonDetailComponent } from '../../components/person-detail/person-detail.component';
 
 
 const routes: Routes = [
-  { path: 'person/form/:id', component: PersonComponent },
-  { path: 'person/form', component: PersonComponent },
-  { path: 'person', component: ListPersonComponent }
+  { path: 'person/form/:id', component: PersonFormComponent },
+  { path: 'person/detail/:id', component: PersonDetailComponent },
+  { path: 'person/form', component: PersonFormComponent },
+  { path: 'person/list', component: PersonListComponent }
 
 ];
 @NgModule({  

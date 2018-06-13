@@ -9,7 +9,7 @@ export class PersonService {
 
     constructor(private http : HttpClient){ }  
 
-    /** It returns a list of person */
+    /** This method returns a list of person */
     getListPerson(pageable : Pageable){
       return this.http.get('http://localhost:8080/person/get/all', {
         params: {
@@ -18,18 +18,23 @@ export class PersonService {
         }        
       });
     }
-    /** It returns a specific person */
+    /** This method returns a specific person */
     get(id :number){
       return this.http.get('http://localhost:8080/person/get/'+id);
     }
 
-    /** It saves a person */
+    /** This method returns a photo of a person */
+    getPhoto(id:number){
+      return this.http.get('http://localhost:8080/person/get/photo/'+id);
+    }
+
+    /** This method saves a person */
     save(person :Person){
       return this.http.post('http://localhost:8080/person/save',person,
         {headers: new HttpHeaders({'Content-Type': 'application/json'})}
       );
     }
-    /** It saves photography */
+    /** This method saves photography */
     savePhoto(id :number, photo: File){
       let formData: FormData = new FormData();
       formData.append('photo',photo);
@@ -37,7 +42,7 @@ export class PersonService {
     }
 
 
-    /** It deletes a person */
+    /** This method deletes a person */
     delete(id :number){
       return this.http.delete('http://localhost:8080/person/delete/'+id);
     }

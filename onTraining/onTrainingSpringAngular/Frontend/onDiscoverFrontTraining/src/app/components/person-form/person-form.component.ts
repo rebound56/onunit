@@ -1,32 +1,28 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { Person } from '../../models/person';
-import { CustomValidator } from '../../utils/custom-validator';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { FormUtil } from '../../utils/form-util';
-import { ActivatedRoute } from '@angular/router';
 import { PersonService } from '../../services/person.service';
+import { ToasterService } from 'angular5-toaster';
+import { Person } from '../../models/person';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NumberUtil } from '../../utils/number-util';
-import { Router } from '@angular/router/';
-import {ToasterService} from 'angular5-toaster';
 import { HttpErrorResponse } from '@angular/common/http';
-
+import { CustomValidator } from '../../utils/custom-validator';
+import { FormUtil } from '../../utils/form-util';
 
 @Component({
-  selector: 'app-person',
-  templateUrl: './person.component.html',
-  styleUrls: ['./person.component.css']
+  selector: 'app-person-form',
+  templateUrl: './person-form.component.html',
+  styleUrls: ['./person-form.component.css']
 })
-export class PersonComponent implements OnInit {
-  // person
+export class PersonFormComponent implements OnInit {
+
+  /** This person variable stores the person */
   person : Person;
-
-  // lists
-  genders : any ;  
-
-  // boolean identifies if form is prepared
-  formPrepared: boolean = false;
-
-  // form
+  /** This array variable stores the list of genders */
+  genders : any ; 
+  /** This boolean variable determines if form is ready  */
+  ready : boolean = false;
+  /** This group of variables abstract the FormGroup and its controls */
   formPerson: FormGroup;
   controlName: FormControl;
   controlLastName: FormControl;
@@ -36,55 +32,51 @@ export class PersonComponent implements OnInit {
   controlGender: FormControl;
   controlBirthDate: FormControl;
   controlIssueDate: FormControl;
-
-  // form-data for image
+  /** This variable stores the state of html element photoInput */
   @ViewChild('photoInput') photoInput;
-  
-  constructor(private route : ActivatedRoute, private router : Router,
-      private personService : PersonService, private toasterService : ToasterService) {}
 
-  ngOnInit() {    
+  constructor(private route : ActivatedRoute, private router : Router,
+    private personService : PersonService, private toasterService : ToasterService) { }
+
+  ngOnInit() {
     this.initLists();
     this.initPerson();
   }
 
-  /** It initializes the lists of the component */
+  /** This method initializes the lists of the component */
   initLists(){
     this.genders = [
       {value: '', label: '-- Select option'},
       {value: 'M', label: 'Male'},
       {value: 'F', label: 'Female'},
-    ]
+    ];
   }
 
-  /** It initializes the person */
+  /** This method initializes the person */
   initPerson(){
     let id = this.route.snapshot.params["id"];
     if(id != undefined){
       if(NumberUtil.isNumber(id)){
-        this.personService.get(id).subscribe((result :Person )=>{
-          // the service has been succesful        
+        this.personService.get(id).subscribe((result :Person )=>{          
           this.initForm(result);        
         }, (error :HttpErrorResponse) => {
           if(error.status == 404){
-            this.toasterService.pop('error', "Error", 'Person has not been found');
+            this.toasterService.pop('error', "Error", 'The person has not been found');
           }else{
-            this.toasterService.pop('error', "Error", 'Error to try finding the person');
-          }
-          
+            this.toasterService.pop('error', "Error", 'It was not possible to load the person');
+          }          
         });
       }else{
-        this.toasterService.pop('error', "Error", 'Person has not been found');
+        // id is incorrect
+        this.toasterService.pop('error', "Error", 'ID person is incorrect');
       }
     }else{
-      // id doesn't exist
+      // id is not assigned
       this.initForm(new Person());    
     }
   }
- 
 
-
-  /** It initializes the form */
+  /** This method initializes the form */
   initForm(person : Person){    
     // initializes the person
     this.person = person;
@@ -147,48 +139,47 @@ export class PersonComponent implements OnInit {
 
     });
     // set form prepared as true
-    this.formPrepared = true; 
+    this.ready = true; 
   }
 
-  /** It returns formdate from photoInput */
-  getPhotoData() : File {
-    let fileBrowser = this.photoInput.nativeElement;
-    if (fileBrowser.files && fileBrowser.files[0]) {
-      return fileBrowser.files[0];      
+  /** This method returns the file from photoInput */
+  getPhotoFile() : File {
+    let fileInput = this.photoInput.nativeElement;
+    if (fileInput.files && fileInput.files[0]) {
+      return fileInput.files[0];      
     }
     return null;
   }
-  
-  
-  /** It saves person */
+
+  /** This method saves person */
   save () {    
     if(this.formPerson.valid){
       this.personService.save(this.person).subscribe((result : any)=> {
-        let photoData = this.getPhotoData();
-        if(photoData){
-          this.personService.savePhoto(result.id,photoData).subscribe((resultPhoto) => {
-            this.toasterService.pop('success', 'Person saved', 'The person and the photography have been saved succesful!');
+        let photoFile = this.getPhotoFile();
+        if(photoFile){
+          this.personService.savePhoto(result.id,photoFile).subscribe((resultPhoto) => {
+            this.toasterService.pop('success', 'Person saved', 'The person and the photography have been saved successfully');
             this.router.navigate(['/person/form/'+result.id]);
           }, (error)=>{
-            this.toasterService.pop('warning', 'Person saved', 'The person has been saved but the photography has not');            
+            this.toasterService.pop('warning', 'Person saved', 'The person has been saved successfully. However, the photography cannot be saved');            
           });          
         }else{
-          this.toasterService.pop('success', 'Person saved', 'The person has been saved succesful!');
+          this.toasterService.pop('success', 'Person saved', 'The person has been saved successfully');
           this.router.navigate(['/person/form/'+result.id]);
         }
       }, (error) =>{
-        this.toasterService.pop('error', "Person did not save", 'The person has not been saved');
+        this.toasterService.pop('error', "Error", 'It was not possible to save the person');
       })
     }else{
       FormUtil.validateFormFields(this.formPerson);
     }
   }
-  
+  /** This methods returns a boolean if the control has any error */
   hasErrors(formControl : FormControl){
     return FormUtil.hasErrors(formControl);
   } 
-
-  hasError(formControl : FormControl, error?:string){
+  /** This methods returns a boolean if the control has a specific error */
+  hasError(formControl : FormControl, error:string){
     return FormUtil.hasError(formControl,error);
   } 
 }
