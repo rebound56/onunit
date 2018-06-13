@@ -25,7 +25,7 @@ export class PersonService {
 
     /** This method returns a photo of a person */
     getPhoto(id:number){
-      return this.http.get('http://localhost:8080/person/get/photo/'+id);
+      return this.http.get('http://localhost:8080/person/get/photo/'+id, {observe:'response', responseType: 'blob'});
     }
 
     /** This method saves a person */

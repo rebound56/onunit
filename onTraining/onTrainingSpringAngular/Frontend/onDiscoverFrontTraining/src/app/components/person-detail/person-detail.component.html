@@ -1,3 +1,60 @@
-<p>
-  person-detail works!
-</p>
+<div class="card " *ngIf="ready">
+  <div class="card-header bg-dark text-white">
+    <div class="row">
+      <div class="col-sm-9">
+        <h3 class="no-margin">Person detail</h3>
+      </div>
+      <div class="col-sm-3 text-align-right">
+        <button class="btn btn-default" routerLink="/person/form/{{person.id}}">
+          <i class="fa fa-pencil-square-o"></i>
+        </button>
+        <button class="btn btn-default" routerLink="/person/list">
+          <i class="fa fa-list"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="card-body">    
+    <div class="row">
+      <div class="col-md-5"  >
+          <img [src]="photo" *ngIf="photo != undefined" alt="imagen"  class="img-thumbnail mx-auto d-block img-fluid">          
+          <div class="alert alert-warning" *ngIf="photo == undefined">
+            The user does not have a photography
+          </div>
+      </div>
+      <div class="col-md-7">
+        <div class="row">
+            <div class="col-md-6">
+              <strong>Name</strong><br/>
+              {{person.name}}
+            </div>
+            <div class="col-md-6">
+              <strong>Last name</strong><br/>
+              {{person.lastName}}
+            </div>
+          <div class="col-md-6">
+            <strong>Number of document</strong><br/>
+            {{person.numberDocument}}
+          </div>
+          <div class="col-md-6">
+            <strong>E-mail</strong><br/>
+            {{person.email}}
+          </div>
+          <div class="col-md-6">
+            <strong>Gender</strong><br/>
+            {{person.gender}}
+          </div>
+          <div class="col-md-6">
+            <strong>Birth date</strong><br/>
+            {{person.birthDate}}
+          </div>
+          <div class="col-md-6">
+            <strong>Issue date</strong><br/>
+            {{person.issueDate}}
+          </div>
+        </div>
+      </div>
+    </div>    
+  </div>  
+</div>
+

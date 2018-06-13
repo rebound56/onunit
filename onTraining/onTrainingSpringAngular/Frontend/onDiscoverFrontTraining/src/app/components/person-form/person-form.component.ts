@@ -159,13 +159,13 @@ export class PersonFormComponent implements OnInit {
         if(photoFile){
           this.personService.savePhoto(result.id,photoFile).subscribe((resultPhoto) => {
             this.toasterService.pop('success', 'Person saved', 'The person and the photography have been saved successfully');
-            this.router.navigate(['/person/form/'+result.id]);
+            this.router.navigate(['/person/detail/'+result.id]);
           }, (error)=>{
             this.toasterService.pop('warning', 'Person saved', 'The person has been saved successfully. However, the photography cannot be saved');            
           });          
         }else{
           this.toasterService.pop('success', 'Person saved', 'The person has been saved successfully');
-          this.router.navigate(['/person/form/'+result.id]);
+          this.router.navigate(['/person/detail/'+result.id]);
         }
       }, (error) =>{
         this.toasterService.pop('error', "Error", 'It was not possible to save the person');

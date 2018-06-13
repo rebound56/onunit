@@ -3,6 +3,8 @@ import { PersonService } from '../../services/person.service';
 import { ActivatedRoute } from '@angular/router';
 import { NumberUtil } from '../../utils/number-util';
 import { Person } from '../../models/person';
+import { HttpResponse } from '@angular/common/http/src/response';
+
 
 @Component({
   selector: 'app-person-detail',
@@ -13,6 +15,10 @@ export class PersonDetailComponent implements OnInit {
 
   /** This person variable stores the person */
   person : Person;
+  /** This variable stores the image photo */
+  photo: any;
+  /** This boolean variable determines if view is ready */
+  ready: boolean = false;
 
   constructor(private personService :PersonService, private route: ActivatedRoute) { }
 
@@ -26,10 +32,21 @@ export class PersonDetailComponent implements OnInit {
       if(NumberUtil.isNumber(id)){
         this.personService.get(id).subscribe((result :Person )=>{      
           this.person = result;
-          this.personService.getPhoto(this.person.id).subscribe((resultPhoto :any) =>{
-            debugger;
-          }, (error) => {
+          this.ready=true;
+          this.personService.getPhoto(this.person.id).subscribe((response : any) =>{
+              if(response.status = 200){
+                let reader = new FileReader();
+                reader.addEventListener("load", () => {
+                  this.photo = reader.result;
+                }, false);
+                if(response.body){
+                  reader.readAsDataURL(response.body);
+                }
 
+              }
+            
+          }, (error) => {
+            console.log(error)
           });
         }, (error) => {
 
