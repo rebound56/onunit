@@ -10,6 +10,7 @@ import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -56,13 +57,37 @@ public class FileSystemService implements IFileSystemService {
 		return false;
 	}
 
+	/*
+	 * @see com.ondiscover.models.services.IFileSystemService#deleteAll()
+	 */
+	@Override
+	public void deleteAll() {
+		FileSystemUtils.deleteRecursively(Paths.get(UPLOAD_DIRECTORY).toFile());
+	}
+
+	/*
+	 * @see com.ondiscover.models.services.IFileSystemService#init()
+	 */
+	@Override
+	public void init() throws IOException {
+		String[] folders = UPLOAD_DIRECTORY.split("/");
+		StringBuilder path = new StringBuilder();
+		for (String folder : folders) {
+			if(!folder.isEmpty()) {
+				path.append("/").append(folder);
+				Files.createDirectory(Paths.get(path.toString()));
+			}
+		}
+		
+	}
+
 	/**
 	 * This method returns a Path
 	 * 
 	 * @param fileName
 	 * @return
 	 */
-	private Path getPathByFileName(String fileName) {		
+	private Path getPathByFileName(String fileName) {
 		StringBuilder strPathFile = new StringBuilder().append(UPLOAD_DIRECTORY).append("//").append(fileName);
 		return Paths.get(strPathFile.toString());
 	}

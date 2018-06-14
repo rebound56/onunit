@@ -669,6 +669,60 @@
                 }
             }
         }
+15) reset the folder where we are uploading files
+    - in IFileSystemService we create 2 methods
+        /**
+        * This method deletes all directory
+        */
+        public void deleteAll();
+        
+        
+        /**
+        * This method initializes the upload folder
+        * @throws IOException
+        */
+        public void init() throws IOException;
+    - in FileSystemService
+        /*
+        * @see com.ondiscover.models.services.IFileSystemService#deleteAll()
+        */
+        @Override
+        public void deleteAll() {
+            FileSystemUtils.deleteRecursively(Paths.get(UPLOAD_DIRECTORY).toFile());
+        }
+
+        /*
+        * @see com.ondiscover.models.services.IFileSystemService#init()
+        */
+        @Override
+        public void init() throws IOException {
+            String[] folders = UPLOAD_DIRECTORY.split("/");
+            StringBuilder path = new StringBuilder();
+            for (String folder : folders) {
+                if(!folder.isEmpty()) {
+                    path.append("/").append(folder);
+                    Files.createDirectory(Paths.get(path.toString()));
+                }
+            }
+            
+        }
+    - in OnDiscoverBackTrainingApplication
+        @SpringBootApplication
+        public class OnDiscoverBackTrainingApplication implements CommandLineRunner {
+            @Autowired
+	        IFileSystemService fileSystemService;
+            ...
+            /**
+            * It runs commands before to deploy
+            * @param args
+            * @throws Exception
+            */
+            @Override
+            public void run(String... args) throws Exception {
+                fileSystemService.deleteAll();
+                fileSystemService.init();
+	        }
+        }
     
 
 

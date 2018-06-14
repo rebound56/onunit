@@ -20,6 +20,21 @@ public interface IFileSystemService {
 	 * @return
 	 */
 	public String copy(MultipartFile file) throws IOException;
+	
+	/**
+	 * This method deletes all directory
+	 */
+	public void deleteAll();
+	
+	
+	/**
+	 * This method initializes the upload folder
+	 * @throws IOException
+	 */
+	public void init() throws IOException;
+	
+	
+	
 
 	/**
 	 * This method delete a filename
