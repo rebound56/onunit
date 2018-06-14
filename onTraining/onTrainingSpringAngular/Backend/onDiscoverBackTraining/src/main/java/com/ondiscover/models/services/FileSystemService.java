@@ -17,7 +17,7 @@ public class FileSystemService implements IFileSystemService {
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
 	/** Variable stores the path directory where files will be saved */
-	public static String UPLOAD_DIRECTORY = "src//main//resources//static//upload";
+	public static String UPLOAD_DIRECTORY = "/ondiscover/uploads";
 
 	/*
 	 * @see com.ondiscover.models.services.IFileSystemService#load(java.lang.String)
@@ -62,9 +62,8 @@ public class FileSystemService implements IFileSystemService {
 	 * @param fileName
 	 * @return
 	 */
-	private Path getPathByFileName(String fileName) {
-		String absolutePath = Paths.get(UPLOAD_DIRECTORY).toFile().getAbsolutePath();
-		StringBuilder strPathFile = new StringBuilder().append(absolutePath).append("//").append(fileName);
+	private Path getPathByFileName(String fileName) {		
+		StringBuilder strPathFile = new StringBuilder().append(UPLOAD_DIRECTORY).append("//").append(fileName);
 		return Paths.get(strPathFile.toString());
 	}
 
