@@ -55,24 +55,18 @@ export class PersonFormComponent implements OnInit {
   /** This method initializes the person */
   initPerson(){
     let id = this.route.snapshot.params["id"];
-    if(id != undefined){
-      if(NumberUtil.isNumber(id)){
-        this.personService.get(id).subscribe((result :Person )=>{          
+    if(id == undefined)
+      this.initForm(new Person()); 
+    else if(!NumberUtil.isNumber(id))   
+      this.toasterService.pop('error', "Error", 'ID person is incorrect');
+    else {
+      this.personService.get(id).subscribe((result :Person )=>{          
           this.initForm(result);        
-        }, (error :HttpErrorResponse) => {
-          if(error.status == 404){
-            this.toasterService.pop('error', "Error", 'The person has not been found');
-          }else{
-            this.toasterService.pop('error', "Error", 'It was not possible to load the person');
-          }          
-        });
-      }else{
-        // id is incorrect
-        this.toasterService.pop('error', "Error", 'ID person is incorrect');
-      }
-    }else{
-      // id is not assigned
-      this.initForm(new Person());    
+      }, (error :HttpErrorResponse) => {
+        if(error.status == 404)
+          return this.toasterService.pop('error', "Error", 'The person has not been found');
+        return this.toasterService.pop('error', "Error", 'It was not possible to load the person');               
+      });
     }
   }
 
@@ -145,19 +139,20 @@ export class PersonFormComponent implements OnInit {
   /** This method returns the file from photoInput */
   getPhotoFile() : File {
     let fileInput = this.photoInput.nativeElement;
-    if (fileInput.files && fileInput.files[0]) {
-      return fileInput.files[0];      
-    }
+    if (fileInput.files && fileInput.files[0])
+      return fileInput.files[0];
     return null;
   }
 
   /** This method saves person */
   save () {    
-    if(this.formPerson.valid){
+    if(!this.formPerson.valid)
+      FormUtil.validateFormFields(this.formPerson);
+    else{
       this.personService.save(this.person).subscribe((result : any)=> {
         let photoFile = this.getPhotoFile();
         if(photoFile){
-          this.personService.savePhoto(result.id,photoFile).subscribe((resultPhoto) => {
+          this.personService.savePhoto(result.id, photoFile).subscribe((resultPhoto) => {
             this.toasterService.pop('success', 'Person saved', 'The person and the photography have been saved successfully');
             this.router.navigate(['/person/detail/'+result.id]);
           }, (error)=>{
@@ -169,11 +164,10 @@ export class PersonFormComponent implements OnInit {
         }
       }, (error) =>{
         this.toasterService.pop('error', "Error", 'It was not possible to save the person');
-      })
-    }else{
-      FormUtil.validateFormFields(this.formPerson);
+      });
     }
   }
+  
   /** This methods returns a boolean if the control has any error */
   hasErrors(formControl : FormControl){
     return FormUtil.hasErrors(formControl);

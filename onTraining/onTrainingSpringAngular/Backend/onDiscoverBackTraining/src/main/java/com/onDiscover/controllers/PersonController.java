@@ -1,10 +1,6 @@
 package com.ondiscover.controllers;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
@@ -28,14 +24,17 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.ondiscover.error.ErrorMessage;
 import com.ondiscover.models.entities.Person;
+import com.ondiscover.models.services.IFileSystemService;
 import com.ondiscover.models.services.IPersonService;
-import com.ondiscover.util.FileUtility;
 
 @Controller
 @RequestMapping(value = "/person")
 public class PersonController {
 	@Autowired
 	private IPersonService personService;
+
+	@Autowired
+	private IFileSystemService fileSystemService;
 
 	@GetMapping(value = "/get/all")
 	public ResponseEntity<Page<Person>> getAll(@RequestParam Map<String, String> mapRequest) {
@@ -53,14 +52,13 @@ public class PersonController {
 
 	@GetMapping(value = "/get/{id}")
 	public ResponseEntity<?> getById(@PathVariable(name = "id") Long id) {
-		if (id == null)
-			return new ResponseEntity<ErrorMessage>(new ErrorMessage("Please set id"), HttpStatus.CONFLICT);
 		try {
+			if (id == null)
+				return new ResponseEntity<ErrorMessage>(new ErrorMessage("Please set id"), HttpStatus.CONFLICT);
 			Person person = personService.findById(id);
-			if (person != null) {
-				return new ResponseEntity<Person>(person, HttpStatus.OK);
-			}
-			return new ResponseEntity<ErrorMessage>(new ErrorMessage("Person not found"), HttpStatus.NOT_FOUND);
+			if (person == null)
+				return new ResponseEntity<ErrorMessage>(new ErrorMessage("Person not found"), HttpStatus.NOT_FOUND);
+			return new ResponseEntity<Person>(person, HttpStatus.OK);
 		} catch (NoSuchElementException ex) {
 			return new ResponseEntity<ErrorMessage>(new ErrorMessage("Person not found"), HttpStatus.NOT_FOUND);
 		}
@@ -68,26 +66,17 @@ public class PersonController {
 
 	@GetMapping(value = "/get/photo/{id}")
 	public ResponseEntity<?> getPhotoById(@PathVariable(name = "id") Long id) {
-		if (id == null)
-			return new ResponseEntity<ErrorMessage>(new ErrorMessage("Please set id"), HttpStatus.CONFLICT);
 		try {
+			if (id == null)
+				return new ResponseEntity<ErrorMessage>(new ErrorMessage("Please set id"), HttpStatus.CONFLICT);
 			Person person = personService.findById(id);
-			if (person != null) {
-				if (person.getPhoto() != null && person.getPhoto().trim().length() > 0) {
-					Path fileDirectory = FileUtility.getPathFileName(person.getPhoto());
-					File f = fileDirectory.toFile();
-					if (f.exists()) {
-						byte[] image = Files.readAllBytes(fileDirectory);
-						return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(image);
-					} else {
-						return new ResponseEntity<ErrorMessage>(new ErrorMessage("The person's image cannot be found"),
-								HttpStatus.CONFLICT);
-					}
-				}
+			if (person == null)
+				return new ResponseEntity<ErrorMessage>(new ErrorMessage("Person not found"), HttpStatus.NOT_FOUND);
+			if (person.getPhoto()== null || person.getPhoto().isEmpty())
 				return new ResponseEntity<ErrorMessage>(new ErrorMessage("Person does not have photography"),
 						HttpStatus.NO_CONTENT);
-			}
-			return new ResponseEntity<ErrorMessage>(new ErrorMessage("Person not found"), HttpStatus.NOT_FOUND);
+			byte[] image = fileSystemService.load(person.getPhoto());
+			return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(image);
 		} catch (NoSuchElementException ex) {
 			return new ResponseEntity<ErrorMessage>(new ErrorMessage("Person not found"), HttpStatus.NOT_FOUND);
 		} catch (IOException e) {
@@ -98,9 +87,9 @@ public class PersonController {
 
 	@PostMapping(value = "/save")
 	public ResponseEntity<?> save(@RequestBody Person person) {
-		if (person == null)
-			return new ResponseEntity<ErrorMessage>(new ErrorMessage("Please set person"), HttpStatus.CONFLICT);
 		try {
+			if (person == null)
+				return new ResponseEntity<ErrorMessage>(new ErrorMessage("Please set person"), HttpStatus.CONFLICT);
 			personService.save(person);
 			return new ResponseEntity<Person>(person, HttpStatus.OK);
 		} catch (Exception ex) {
@@ -112,57 +101,40 @@ public class PersonController {
 
 	@PostMapping(value = "/save/photo/{id}", headers = "Content-Type=multipart/form-data")
 	public ResponseEntity<?> savePhoto(@PathVariable(name = "id") Long id, @RequestParam("photo") MultipartFile photo) {
-		if (id == null)
-			return new ResponseEntity<ErrorMessage>(new ErrorMessage("Please set id"), HttpStatus.CONFLICT);
-		if (photo == null)
-			return new ResponseEntity<ErrorMessage>(new ErrorMessage("Please send file photo"), HttpStatus.CONFLICT);
-
 		try {
+			if (id == null)
+				return new ResponseEntity<ErrorMessage>(new ErrorMessage("Please set id"), HttpStatus.CONFLICT);
+			if (photo == null)
+				return new ResponseEntity<ErrorMessage>(new ErrorMessage("Please send file photo"),
+						HttpStatus.CONFLICT);
 			Person person = personService.findById(id);
-			if (person != null) {
-				try {
-					// save image into fyle system
-					String filename = FileUtility.generateRandomFileName(photo);
-					FileUtility.writeFile(filename, photo);
-
-					// delete old image into fyle system
-					String oldFilename = person.getPhoto();
-					if (oldFilename != null && oldFilename.trim().length() > 0) {
-						FileUtility.deleteFile(oldFilename);
-					}
-
-					// save person with new image
-					person.setPhoto(filename);
-					this.personService.save(person);
-					return new ResponseEntity<Object>(HttpStatus.OK);
-				} catch (IOException e) {
-					return new ResponseEntity<ErrorMessage>(new ErrorMessage("Error trying to upload image"),
-							HttpStatus.INTERNAL_SERVER_ERROR);
-				}
-			}
-			return new ResponseEntity<ErrorMessage>(new ErrorMessage("Person not found"), HttpStatus.NOT_FOUND);
+			if (person == null)
+				return new ResponseEntity<ErrorMessage>(new ErrorMessage("Person not found"), HttpStatus.NOT_FOUND);
+			if (person.getPhoto() != null && !person.getPhoto().isEmpty())
+				fileSystemService.delete(person.getPhoto());
+			person.setPhoto(fileSystemService.copy(photo));
+			this.personService.save(person);
+			return new ResponseEntity<Object>(HttpStatus.OK);
 		} catch (NoSuchElementException ex) {
 			return new ResponseEntity<ErrorMessage>(new ErrorMessage("Person not found"), HttpStatus.NOT_FOUND);
+		} catch (IOException e) {
+			return new ResponseEntity<ErrorMessage>(new ErrorMessage("File cannot be saved"),
+					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
 	@DeleteMapping(value = "/delete/{id}")
 	public ResponseEntity<?> delete(@PathVariable(name = "id") Long id) {
-		if (id == null)
-			return new ResponseEntity<ErrorMessage>(new ErrorMessage("Please set id"), HttpStatus.CONFLICT);
 		try {
+			if (id == null)
+				return new ResponseEntity<ErrorMessage>(new ErrorMessage("Please set id"), HttpStatus.CONFLICT);
 			Person person = personService.findById(id);
-			if (person != null) {
-				try {
-					personService.delete(person);
-					return new ResponseEntity<Object>(HttpStatus.OK);
-				} catch (Exception ex) {
-					return new ResponseEntity<ErrorMessage>(
-							new ErrorMessage("Error in some validations: " + ex.getLocalizedMessage()),
-							HttpStatus.INTERNAL_SERVER_ERROR);
-				}
-			}
-			return new ResponseEntity<ErrorMessage>(new ErrorMessage("Person not found"), HttpStatus.NOT_FOUND);
+			if (person == null)
+				return new ResponseEntity<ErrorMessage>(new ErrorMessage("Person not found"), HttpStatus.NOT_FOUND);
+			if (person.getPhoto() != null && !person.getPhoto().isEmpty())
+				fileSystemService.delete(person.getPhoto());
+			personService.delete(person);
+			return new ResponseEntity<Object>(HttpStatus.OK);
 		} catch (NoSuchElementException ex) {
 			return new ResponseEntity<ErrorMessage>(new ErrorMessage("Person not found"), HttpStatus.NOT_FOUND);
 		}

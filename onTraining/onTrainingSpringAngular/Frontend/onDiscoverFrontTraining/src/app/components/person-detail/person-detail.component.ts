@@ -29,34 +29,33 @@ export class PersonDetailComponent implements OnInit {
 
   initPerson(){
     let id = this.route.snapshot.params["id"];
-    if(id != null && NumberUtil.isNumber(id)){
-        this.personService.get(id).subscribe((result :Person )=>{      
-          this.person = result;
-          this.ready=true;
-          this.personService.getPhoto(this.person.id).subscribe((response : any) =>{
-              if(response.status = 200){
-                let reader = new FileReader();
-                reader.addEventListener("load", () => {
-                  this.photo = reader.result;
-                }, false);
-                if(response.body){
-                  reader.readAsDataURL(response.body);
-                }
-              }            
-          }, (error) => {
-            
-          });
-        }, (error: any) => {
-          if(error.status == 404){
-            this.toasterService.pop('error', 'Error', 'Person is not found');
-          }else{
-            this.toasterService.pop('error', 'Error', 'it was not possible to load the person');
-          }          
+    if(id == null || !NumberUtil.isNumber(id))
+      this.toasterService.pop('error', 'Error', 'ID person is incorrect');
+    else {
+      this.personService.get(id).subscribe((result :Person )=>{      
+        this.person = result;
+        this.ready=true;
+        this.personService.getPhoto(this.person.id).subscribe((response : any) =>{
+            if(response.status = 200){
+              let reader = new FileReader();
+              reader.addEventListener("load", () => {
+                this.photo = reader.result;
+              }, false);
+              if(response.body){
+                reader.readAsDataURL(response.body);
+              }
+            }            
+        }, (error) => {
+          this.toasterService.pop('error', 'Error', 'It was not possible to load the photo');
         });
-      }else{
-        this.toasterService.pop('error', 'Error', 'ID person is incorrect');
-      }
-   
+      }, (error: any) => {
+        if(error.status == 404){
+          this.toasterService.pop('error', 'Error', 'Person is not found');
+        }else{
+          this.toasterService.pop('error', 'Error', 'it was not possible to load the person');
+        }          
+      });
+    }
   }
 
 }

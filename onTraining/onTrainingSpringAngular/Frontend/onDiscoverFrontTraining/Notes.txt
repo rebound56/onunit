@@ -12,11 +12,14 @@
     - in app-routing.module.ts:
         import { NgModule } from '@angular/core';
         import { RouterModule, Routes } from '@angular/router';
-        import { PersonComponent} from '../../components/person/person.component';
+        import { PersonFormComponent} from '../../components/person/person-form.component';
 
 
         const routes: Routes = [
-        { path: 'person', component: PersonComponent }
+            { path: 'person/form', component: PersonFormComponent }
+            { path: 'person/form/:id', component: PersonFormComponent }
+            { path: 'person/list', component: PersonListComponent }
+            { path: 'person/detail/:id', component: PersonDetailComponent }
         ];
         @NgModule({  
         exports: [RouterModule],
@@ -43,7 +46,7 @@
 
         
 5.2) Creating a form with standard validators
-    - in person.component.ts
+    - in person-form.component.ts
 
         import { Component, OnInit } from '@angular/core';
         import { Person } from '../../models/person';
@@ -51,10 +54,10 @@
 
         @Component({
             selector: 'app-person',
-            templateUrl: './person.component.html',
-            styleUrls: ['./person.component.css']
+            templateUrl: './person-form.component.html',
+            styleUrls: ['./person-form.component.css']
         })
-        export class PersonComponent implements OnInit {
+        export class PersonFormComponent implements OnInit {
 
             person : Person = {
                 id:1,
@@ -81,7 +84,7 @@
             }
         }
     
-    - in person.component.html
+    - in person-form.component.html
         <form [formGroup]="formPerson"  (ngSubmit)="save()">
             <div class="row">
                 <div class="col-sm-4">
@@ -119,17 +122,17 @@
                 }
             }
         }
-    - in person.component.ts
+    - in person-form.component.ts
         import { CustomValidator } from '../../utils/custom-validator';
         import { FormGroup, FormControl, Validators } from '@angular/forms';
 
 
         @Component({
         selector: 'app-person',
-        templateUrl: './person.component.html',
-        styleUrls: ['./person.component.css']
+        templateUrl: './person-form.component.html',
+        styleUrls: ['./person-form.component.css']
         })
-        export class PersonComponent implements OnInit {
+        export class PersonFormComponent implements OnInit {
             ...
             formPerson: FormGroup;
             controlNumberDocument: FormControl;
@@ -151,7 +154,7 @@
                 })                   
             }
         }
-    - in person.component.html
+    - in person-form.component.html
          <form [formGroup]="formPerson"  (ngSubmit)="save()">
             <div class="row">
                 <div class="col-sm-4">
@@ -194,7 +197,7 @@
                 });
             }
         }
-    - in person.component.ts
+    - in person-form.component.ts
         save () {
             if(this.formPerson.valid){
             alert("Saved!");
@@ -222,7 +225,7 @@
             return FormUtil.hasErrors(formControl) && formControl.errors[error];
         } 
 
-    - In person.component.ts create methods to handle validators errors
+    - In person-form.component.ts create methods to handle validators errors
         hasErrors(formControl : FormControl){
             return FormUtil.hasErrors(formControl);
         } 
@@ -231,7 +234,7 @@
             return FormUtil.hasError(formControl,error);
         } 
 
-    - In person.component.html implement the methods
+    - In person-form.component.html implement the methods
         <div class="col-md-3">
             <div class="form-group" [ngClass]="{'has-error': hasErrors(controlNumberDocument)}">      
                 <label for="numberDocument" class="form-control-label">Number of document</label>
@@ -278,16 +281,16 @@
             return this.http.get('http://localhost:8080/person/');
             }
         }
-    - In components/list-person.component.ts
+    - In components/person-list.component.ts
         import { Component, OnInit } from '@angular/core';
         import { PersonService } from '../../services/person.service';
 
         @Component({
-        selector: 'app-list-person',
-        templateUrl: './list-person.component.html',
-        styleUrls: ['./list-person.component.css']
+        selector: 'app-person-list',
+        templateUrl: './person-list.component.html',
+        styleUrls: ['./person-list.component.css']
         })
-        export class ListPersonComponent implements OnInit {
+        export class PersonListComponent implements OnInit {
         listPerson : any;
             constructor(private personService: PersonService) {}
             ngOnInit() {
@@ -302,7 +305,7 @@
                 });
             }
         }    
-    - In components/list-person.component.html
+    - In components/person-list.component.html
          <div class="jumbotron">
             <h1>List person</h1>
             <div class="table-responsive">
@@ -346,9 +349,9 @@
             return this.http.get('http://localhost:8080/person/'+id);
             }
         }
-    - In person.component.ts , I had to create a boolean variable to show the form when it is prepared so:
+    - In person-form.component.ts , I had to create a boolean variable to show the form when it is prepared so:
         ...
-        export class PersonComponent implements OnInit {
+        export class PersonFormComponent implements OnInit {
             ...
             // boolean identifies if form is prepared
             formPrepared: boolean = false;    
@@ -446,7 +449,7 @@
                 // set form prepared as true
                 this.formPrepared = true; 
             }
-    - In person.component.html
+    - In person-form.component.html
         <div class="jumbotron">
         <h1>Person</h1>
         <form [formGroup]="formPerson"  (ngSubmit)="save()" *ngIf="formPrepared">
@@ -486,7 +489,7 @@
         ]
     - add a tag html in app.component.html
         <toaster-container></toaster-container>
-    - how to implement, in person.component.ts
+    - how to implement, in person-form.component.ts
         ...
         import {ToasterService} from 'angular5-toaster';
         ...
@@ -731,8 +734,8 @@
                     </table>
                 </div>
             </app-datatable>
-        - Finally in list-person.component.html I decided to listen the event when the pageable has changed
-            export class ListPersonComponent implements OnInit {
+        - Finally in person-list.component.html I decided to listen the event when the pageable has changed
+            export class PersonListComponent implements OnInit {
                 pageable : Pageable;
 
                 constructor(private personService: PersonService, private toasterService : ToasterService) { 
@@ -777,8 +780,114 @@
                 }
             }
 
+12) File system
+    - in person.service
+        /** This method returns a photo of a person */
+        getPhoto(id:number){
+            return this.http.get('http://localhost:8080/person/get/photo/'+id, {observe:'response', responseType: 'blob'});
+        }
+        
+        /** This method saves photography */
+        savePhoto(id :number, photo: File){
+            let formData: FormData = new FormData();
+            formData.append('photo',photo);
+            return this.http.post('http://localhost:8080/person/save/photo/'+id,formData);
+        }
+    - in person-detail.component.ts
+        /** This person variable stores the person */
+        person : Person;
+        /** This variable stores the image photo */
+        photo: any;
+        /** This boolean variable determines if view is ready */
+        ready: boolean = false;
+
+        ngOnInit() {
+            this.initPerson();
+        }
+
+        initPerson(){
+            let id = this.route.snapshot.params["id"];
+            if(id == null || !NumberUtil.isNumber(id))
+            this.toasterService.pop('error', 'Error', 'ID person is incorrect');
+            else {
+            this.personService.get(id).subscribe((result :Person )=>{      
+                this.person = result;
+                this.ready=true;
+                this.personService.getPhoto(this.person.id).subscribe((response : any) =>{
+                    if(response.status = 200){
+                    let reader = new FileReader();
+                    reader.addEventListener("load", () => {
+                        this.photo = reader.result;
+                    }, false);
+                    if(response.body){
+                        reader.readAsDataURL(response.body);
+                    }
+                    }            
+                }, (error) => {
+                this.toasterService.pop('error', 'Error', 'It was not possible to load the photo');
+                });
+            }, (error: any) => {
+                if(error.status == 404){
+                this.toasterService.pop('error', 'Error', 'Person is not found');
+                }else{
+                this.toasterService.pop('error', 'Error', 'it was not possible to load the person');
+                }          
+            });
+            }
+        }
+    - in person-detail.component.html
+        <img [src]="photo" *ngIf="photo != undefined" alt="imagen"  class="img-thumbnail mx-auto d-block img-fluid">
+
+    - in person-form-component.ts
+        export class PersonFormComponent implements OnInit {
+            ...
+            @ViewChild('photoInput') photoInput;
+            ...
+            /** This method returns the file from photoInput */
+            getPhotoFile() : File {
+                let fileInput = this.photoInput.nativeElement;
+                if (fileInput.files && fileInput.files[0])
+                    return fileInput.files[0];
+                return null;
+            }
+            ...
+            /** This method saves person */
+            save () {    
+                if(!this.formPerson.valid)
+                FormUtil.validateFormFields(this.formPerson);
+                else{
+                this.personService.save(this.person).subscribe((result : any)=> {
+                    let photoFile = this.getPhotoFile();
+                    if(photoFile){
+                    this.personService.savePhoto(result.id, photoFile).subscribe((resultPhoto) => {
+                        this.toasterService.pop('success', 'Person saved', 'The person and the photography have been saved successfully');
+                        this.router.navigate(['/person/detail/'+result.id]);
+                    }, (error)=>{
+                        this.toasterService.pop('warning', 'Person saved', 'The person has been saved successfully. However, the photography cannot be saved');            
+                    });          
+                    }else{
+                    this.toasterService.pop('success', 'Person saved', 'The person has been saved successfully');
+                    this.router.navigate(['/person/detail/'+result.id]);
+                    }
+                }, (error) =>{
+                    this.toasterService.pop('error', "Error", 'It was not possible to save the person');
+                });
+                }
+            }
+        }
+    - in person-form.component.html
+        <div class="col-md-4">
+            <div class="form-group">
+                <div class="custom-file">
+                    <input type="file" #photoInput class="custom-file-input" id="photo" name="photo" accept="image/*">
+                    <label class="custom-file-label" for="photo">Choose a photography...</label>
+                </div>
+            </div>
+        </div> 
+    
 
 
+                    
                 
 
 
