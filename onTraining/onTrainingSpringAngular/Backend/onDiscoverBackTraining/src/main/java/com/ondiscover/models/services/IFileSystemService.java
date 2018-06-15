@@ -19,7 +19,7 @@ public interface IFileSystemService {
 	 * @param file
 	 * @return
 	 */
-	public String copy(MultipartFile file) throws IOException;
+	public String copy(String prefix, MultipartFile file) throws IOException;
 	
 	/**
 	 * This method deletes all directory

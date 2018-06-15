@@ -112,7 +112,7 @@ public class PersonController {
 				return new ResponseEntity<ErrorMessage>(new ErrorMessage("Person not found"), HttpStatus.NOT_FOUND);
 			if (person.getPhoto() != null && !person.getPhoto().isEmpty())
 				fileSystemService.delete(person.getPhoto());
-			person.setPhoto(fileSystemService.copy(photo));
+			person.setPhoto(fileSystemService.copy("person",photo));
 			this.personService.save(person);
 			return new ResponseEntity<Object>(HttpStatus.OK);
 		} catch (NoSuchElementException ex) {

@@ -35,8 +35,8 @@ public class FileSystemService implements IFileSystemService {
 	 * web.multipart.MultipartFile)
 	 */
 	@Override
-	public String copy(MultipartFile file) throws IOException {
-		String fileName = this.generateRandomFileName(file);
+	public String copy(String prefix,MultipartFile file) throws IOException {
+		String fileName = this.generateRandomFileName(prefix,file);
 		Path fileDirectory = this.getPathByFileName(fileName);
 		Files.write(fileDirectory, file.getBytes());
 		return fileName;
@@ -71,11 +71,13 @@ public class FileSystemService implements IFileSystemService {
 	@Override
 	public void init() throws IOException {
 		String[] folders = UPLOAD_DIRECTORY.split("/");
-		StringBuilder path = new StringBuilder();
+		StringBuilder strDirectory = new StringBuilder();
 		for (String folder : folders) {
-			if(!folder.isEmpty()) {
-				path.append("/").append(folder);
-				Files.createDirectory(Paths.get(path.toString()));
+			if(!folder.isEmpty()) {				
+				strDirectory.append("/").append(folder);
+				Path path = Paths.get(strDirectory.toString());
+				if(!path.toFile().exists())				
+					Files.createDirectory(Paths.get(path.toString()));
 			}
 		}
 		
@@ -95,11 +97,12 @@ public class FileSystemService implements IFileSystemService {
 	/**
 	 * Method generates random Filename
 	 * 
+	 * @param prefix
 	 * @param file
 	 * @return
 	 */
-	private String generateRandomFileName(MultipartFile file) {
-		StringBuilder stringBuilder = new StringBuilder().append(String.valueOf(new Date().getTime()));
+	private String generateRandomFileName(String prefix, MultipartFile file) {
+		StringBuilder stringBuilder = new StringBuilder().append(prefix).append("_").append(String.valueOf(new Date().getTime()));
 		if (file != null) {
 			stringBuilder.append(".").append(file.getContentType().split("/")[1]).toString();
 		}
