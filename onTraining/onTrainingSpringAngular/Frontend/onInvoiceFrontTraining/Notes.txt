@@ -1,0 +1,33 @@
+1) Create project
+    >ng new onInvoiceFrontTraining
+2) Create components
+    >ng g component components/personList
+    >ng g component components/personForm
+    >ng g component components/personDetail
+4) Create models
+    >ng g class models/person
+    >ng g class models/pageable
+3) Create services
+    >ng g service services/person
+4) Create modules
+    >ng g module modules/routing
+        - in routing
+            import { NgModule } from '@angular/core';
+            import { RouterModule, Routes } from '@angular/router';
+            import { CommonModule } from '@angular/common';
+            import { PersonFormComponent } from '../../components/person-form/person-form.component';
+            import { PersonListComponent } from '../../components/person-list/person-list.component';
+            import { PersonDetailComponent } from '../../components/person-detail/person-detail.component';
+
+            const routes: Routes = [
+            { path: 'person/form/:id', component: PersonFormComponent },
+            { path: 'person/detail/:id', component: PersonDetailComponent },
+            { path: 'person/form', component: PersonFormComponent },
+            { path: 'person/list', component: PersonListComponent }
+            ];
+            @NgModule({
+            imports: [RouterModule.forRoot(routes)],
+            exports: [RouterModule],
+            declarations: []
+            })
+            export class RoutingModule { }
