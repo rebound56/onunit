@@ -31,3 +31,63 @@
             declarations: []
             })
             export class RoutingModule { }
+5) adding toaster and loader
+    - execute
+        npm install angular5-toaster --save
+    - in angular-cli.json in style we add the style of toaster
+        "styles": [
+            "styles.css",
+            "assets/form.css",
+            "../node_modules/angular5-toaster/dist/toaster.css"
+        ],
+    - import toastermodule in app.module.ts
+        import {ToasterModule} from 'angular5-toaster';
+        import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+        ...
+        imports: [
+            ToasterModule,
+            BrowserAnimationsModule
+        ]
+    - add a tag html in app.component.html
+        <toaster-container></toaster-container>
+6) http loader 
+    - execute
+        >npm install ng-http-loader@0.9.1 --save 
+    - in app.module
+        ..
+        import { NgHttpLoaderModule } from 'ng-http-loader/ng-http-loader.module';
+        ..
+        imports: [
+            ...
+            NgHttpLoaderModule
+        ],
+    - add spiner on app.component.html
+        <spinner></spinner>    
+
+7) Get bootstrap
+    - execute
+        npm install bootstrap@4.0.0 font-awesome@4.7.0 jquery@1.9.1 --save
+    - in .angular-cli.json
+        {
+            "apps": [
+                {
+                "root": "src",
+                "styles": [
+                    "../node_modules/bootstrap/dist/css/bootstrap.min.css",
+                    "../node_modules/font-awesome/css/font-awesome.css",
+                    "styles.css"
+                ]
+                }
+            ]
+        }
+8) add modules 
+    - in app.module.ts
+        import { FormsModule } from '@angular/forms';
+        import { ReactiveFormsModule } from "@angular/forms";
+        import { HttpClientModule } from '@angular/common/http';
+        ...
+        FormsModule,
+        ReactiveFormsModule,
+        HttpClientModule
+        ...
+    

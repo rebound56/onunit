@@ -8,6 +8,7 @@ import { Person } from '../models/person';
 export class PersonService {
 
   constructor(private http : HttpClient) { }
+  
   /** This method get person page */
   getAll(pageable: Pageable){
     let options: any = {};

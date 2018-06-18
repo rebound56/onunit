@@ -1,0 +1,56 @@
+<div class="card" >
+  <div class="card-header bg-dark text-white">
+      <div class="row">
+        <div class="col-9">
+            <h3 class="no-margin">{{title}}</h3>
+        </div>
+        <div class="col-3 text-align-right">
+          <div class="datatable-records">
+            {{pageable.numberOfElements}}/{{pageable.totalElements}}
+          </div>
+        </div>
+      </div>            
+  </div>
+  <div class="card-body" *ngIf="ready">    
+    <ng-content></ng-content>        
+  </div> 
+  <div class="card-footer">
+    <div class="row">
+      <div class="col-sm-3 col-md-1">
+          <select class="form-control form-control-sm" [(ngModel)]="pageable.size" (change)="setPage(getFirstIndex())">
+              <option *ngFor="let size of listSize" [value]="size">{{size}}</option>
+          </select>
+      </div>
+      <div class="col-sm-9 col-md-11">
+        <nav>
+            <ul class="pagination pagination-sm justify-content-end">
+              <li class="page-item" [ngClass]="{'disabled': isFirst()}">
+                <a class="page-link" *ngIf="!isFirst()" (click)="setPage(getFirstIndex())" >First</a>
+                <span class="page-link" *ngIf="isFirst()">First</span>
+              </li>
+              <li class="page-item" [ngClass]="{'disabled': !hasPrev()}">
+                  <a class="page-link" *ngIf="hasPrev()" (click)="setPage(getPrevIndex())" >Prev</a>
+                  <span class="page-link" *ngIf="!hasPrev()">Prev</span>
+              </li>
+              <ng-container *ngFor="let page of pageable.listPages">
+                  <li class="page-item" [ngClass]="{'active': page.active}">
+                    <a class="page-link"  (click)="setPage(page.index)">{{page.label}}</a>
+                  </li>
+              </ng-container>                   
+              <li class="page-item" [ngClass]="{'disabled': !hasNext()}">
+                  <a class="page-link" *ngIf="hasNext()" (click)="setPage(getNextIndex())" >Next</a>
+                  <span class="page-link" *ngIf="!hasNext()">Next</span>
+              </li>
+              <li class="page-item" [ngClass]="{'disabled': isLast()}">
+                  <a class="page-link" *ngIf="!isLast()" (click)="setPage(getLastIndex())" >Last</a>
+                  <span class="page-link" *ngIf="isLast()">Last</span>
+              </li>
+            </ul>
+          </nav>
+      </div>            
+    </div>
+  </div>
+
+
+
+

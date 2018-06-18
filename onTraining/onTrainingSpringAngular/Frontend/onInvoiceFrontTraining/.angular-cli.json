@@ -19,7 +19,10 @@
       "testTsconfig": "tsconfig.spec.json",
       "prefix": "app",
       "styles": [
+        "../node_modules/bootstrap/dist/css/bootstrap.min.css",
+        "../node_modules/angular5-toaster/dist/toaster.css",
         "styles.css"
+
       ],
       "scripts": [],
       "environmentSource": "environments/environment.ts",

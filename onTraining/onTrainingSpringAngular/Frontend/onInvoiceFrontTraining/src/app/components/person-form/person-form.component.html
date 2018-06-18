@@ -1,3 +1,107 @@
-<p>
-  person-form works!
-</p>
+<form [formGroup]="formPerson" (ngSubmit)="save()" *ngIf="ready">
+  <div class="card " *ngIf="ready">
+      <div class="card-header bg-dark text-white">
+          <div class="row">
+            <div class="col-sm-9">
+              <h3 class="no-margin">Person form</h3>
+            </div>
+            <div class="col-sm-3 text-align-right" >
+              <button class="btn btn-default" routerLink="/person/detail/{{person.id}}" *ngIf="person.id != undefined">
+                <i class="fa fa-eye"></i>
+              </button>
+              <button class="btn btn-default" routerLink="/person/list">
+                <i class="fa fa-list"></i>
+              </button>
+            </div>
+          </div>
+      </div>
+      <div class="card-body">
+        <div class="row">
+
+          <div class="col-md-6">
+            <div class="form-group" [ngClass]="{'has-error': hasErrors(controlName)}">     
+                <label for="name" class="form-control-label">Name</label>
+                <input type="text" class="form-control" name="name" id="name" placeholder="Name" formControlName="controlName" [(ngModel)]="person.name" />
+                <div class="form-control-feedback">
+                    <small *ngIf="hasError(controlName,'required')">Name is required</small>
+                    <small *ngIf="hasError(controlName,'minlength')">Name must be greater than 3 characters long</small>
+                    <small *ngIf="hasError(controlName,'maxlength')">Name must be lesser than 150 characters long</small>
+                </div>      
+            </div>
+          </div>
+    
+          <div class="col-md-6">
+            <div class="form-group" [ngClass]="{'has-error': hasErrors(controlLastName)}">      
+              <label for="lastName" class="form-control-label">Last name</label>
+              <input type="text" class="form-control" name="lastName" id="lastName" placeholder="Last name" formControlName="controlLastName" [(ngModel)]="person.lastName" />
+              <div class="form-control-feedback">
+                  <small *ngIf="hasError(controlLastName,'required')">Last name is required</small>
+                  <small *ngIf="hasError(controlLastName,'minlength')">Last name must be greater than 3 characters long</small>
+                  <small *ngIf="hasError(controlLastName,'maxlength')">Last name must be lesser than 200 characters long</small>
+              </div> 
+            </div>
+          </div>
+    
+          <div class="col-md-4">
+            <div class="form-group" [ngClass]="{'has-error': hasErrors(controlEmail)}">      
+              <label for="email" class="form-control-label">E-mail</label>
+              <input type="text" class="form-control" name="email" id="email" placeholder="E-mail" formControlName="controlEmail" [(ngModel)]="person.email" />
+              <div class="form-control-feedback">
+                  <small *ngIf="hasError(controlEmail,'required')">E-mail is required</small>
+                  <small *ngIf="hasError(controlEmail,'minlength')">E-mail must be greater than 3 characters long</small>
+                  <small *ngIf="hasError(controlEmail,'maxlength')">E-mail must be lesser than 200 characters long</small>
+                  <small *ngIf="hasError(controlEmail,'email')">E-mail is invalid</small>
+              </div> 
+            </div>
+          </div>
+    
+          <div class="col-md-4">
+            <div class="form-group" [ngClass]="{'has-error': hasErrors(controlNumberDocument)}">      
+              <label for="numberDocument" class="form-control-label">Number of document</label>
+              <input type="number" class="form-control" name="numberDocument" id="numberDocument" placeholder="Number of document" formControlName="controlNumberDocument" [(ngModel)]="person.numberDocument" />
+              <div class="form-control-feedback">
+                  <small *ngIf="hasError(controlNumberDocument,'required')">Number of document is required</small>
+                  <small *ngIf="hasError(controlNumberDocument,'minlength')">Number of document must be greater than 3 characters long</small>
+                  <small *ngIf="hasError(controlNumberDocument,'maxlength')">Number of document must be lesser than 200 characters long</small>            
+                  <small *ngIf="hasError(controlNumberDocument,'number')">Number of document must be numeric</small>
+              </div> 
+            </div>
+          </div>
+    
+          <div class="col-md-4">
+            <div class="form-group" [ngClass]="{'has-error': hasErrors(controlPhone)}">      
+              <label for="phone" class="form-control-label">Phone</label>
+              <input type="number" class="form-control" name="phone" id="phone" placeholder="Phone" formControlName="controlPhone" [(ngModel)]="person.phone" />
+              <div class="form-control-feedback">
+                  <small *ngIf="hasError(controlPhone,'required')">Phone is required</small>
+                  <small *ngIf="hasError(controlPhone,'minlength')">Phone must be greater than 3 characters long</small>
+                  <small *ngIf="hasError(controlPhone,'maxlength')">Phone must be lesser than 20 characters long</small> 
+                  <small *ngIf="hasError(controlPhone,'number')">Phone must be numeric</small>            
+              </div> 
+            </div>
+          </div>
+    
+          <div class="col-md-4">
+            <div class="form-group" [ngClass]="{'has-error': hasErrors(controlGender)}">
+              <label for="gender" class="form-control-label">Gender</label>
+              <select name="gender" id="gender" formControlName="controlGender" class="form-control" [(ngModel)]="person.gender">
+                <option *ngFor="let gender of genders" [value]="gender.value">{{gender.label}}</option>
+              </select>
+              <div class="form-control-feedback">
+                <small *ngIf="hasError(controlGender,'required')">Gender is required</small>
+              </div>
+            </div>
+          </div> 
+
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="row">
+          <div class="col-md-10">&nbsp;</div>
+          <div class="col-md-2">
+            <button type="submit" class="btn btn-success form-control">Save</button>
+          </div>         
+        </div>
+      </div>
+  </div>
+</form>
