@@ -1,18 +1,13 @@
 package com.oninvoice.models.entities;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
@@ -74,9 +69,6 @@ public class Person implements Serializable {
 	@Temporal(TemporalType.DATE)
 	@NotNull
 	private Date modifiedAt;
-
-	@OneToMany(fetch = FetchType.LAZY, cascade= CascadeType.ALL, mappedBy="person")
-	private List<Invoice> listInvoice;
 
 	public Person() {
 		super();
@@ -154,14 +146,6 @@ public class Person implements Serializable {
 		this.modifiedAt = modifiedAt;
 	}
 
-	public List<Invoice> getListInvoice() {
-		return listInvoice;
-	}
-
-	public void setListInvoice(List<Invoice> listInvoice) {
-		this.listInvoice = listInvoice;
-	}
-
 	@Override
 	public String toString() {
 		return "Person [id=" + id + ", name=" + name + ", lastName=" + lastName + ", email=" + email + ", phone="
@@ -203,17 +187,6 @@ public class Person implements Serializable {
 	@PreUpdate
 	public void preUpdate() {
 		this.modifiedAt = new Date();
-	}
-
-	/**
-	 * THis method adds invoice to the listInvoice
-	 * 
-	 * @param invoice
-	 */
-	public void addInvoice(Invoice invoice) {
-		if (listInvoice == null)
-			listInvoice = new ArrayList<>();
-		listInvoice.add(invoice);
 	}
 
 }

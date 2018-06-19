@@ -64,11 +64,12 @@ public class Invoice implements Serializable {
 	private Date modifiedAt;
 
 	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "person_id")
 	private Person person;
 
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "invoice_id")
-	List<Item> listItem;
+	private List<Item> listItem;
 
 	public Long getId() {
 		return id;
@@ -194,7 +195,6 @@ public class Invoice implements Serializable {
 			return false;
 		return true;
 	}
-
 
 	@PrePersist
 	public void prePersist() {
