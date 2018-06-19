@@ -30,4 +30,16 @@ export class PersonListComponent implements OnInit {
       this.toasterService.pop('error', "Error", 'It was not possible to list person');
     })
   }
+
+  /** This method deletes a person */
+  delete(id :number){
+    if(confirm('Are you sure you want to delete this person?')){
+      this.personService.delete(id).subscribe((result) => {       
+        this.toasterService.pop('success', "Person deleted", 'Person has been deleted successfully');
+        this.initList(this.pageable)
+      }, (error) => {
+        this.toasterService.pop('error', "Error", 'It was not possible to delete the person');
+      })
+    }
+  }
 }

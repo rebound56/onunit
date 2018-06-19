@@ -63,7 +63,7 @@ public class Person implements Serializable {
 	@Column(name = "created_at")
 	@Temporal(TemporalType.DATE)
 	@NotNull
-	private Date createAt;
+	private Date createdAt;
 
 	@Column(name = "modified_at")
 	@Temporal(TemporalType.DATE)
@@ -130,12 +130,12 @@ public class Person implements Serializable {
 		this.numberDocument = numberDocument;
 	}
 
-	public Date getCreateAt() {
-		return createAt;
+	public Date getCreatedAt() {
+		return createdAt;
 	}
 
-	public void setCreateAt(Date createAt) {
-		this.createAt = createAt;
+	public void setCreatedAt(Date createAt) {
+		this.createdAt = createAt;
 	}
 
 	public Date getModifiedAt() {
@@ -149,7 +149,7 @@ public class Person implements Serializable {
 	@Override
 	public String toString() {
 		return "Person [id=" + id + ", name=" + name + ", lastName=" + lastName + ", email=" + email + ", phone="
-				+ phone + ", gender=" + gender + ", idCard=" + numberDocument + ", createAt=" + createAt
+				+ phone + ", gender=" + gender + ", idCard=" + numberDocument + ", createAt=" + createdAt
 				+ ", modifiedAt=" + modifiedAt + "]";
 	}
 
@@ -180,7 +180,7 @@ public class Person implements Serializable {
 
 	@PrePersist
 	public void prePersist() {
-		this.createAt = new Date();
+		this.createdAt = new Date();
 		preUpdate();
 	}
 

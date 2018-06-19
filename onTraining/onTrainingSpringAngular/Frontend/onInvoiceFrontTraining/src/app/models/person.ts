@@ -6,6 +6,6 @@ export class Person {
     phone: string;
     gender: string;
     numberDocument: string;
-    createAt: string;
+    createdAt: string;
     modifiedAt: string;
 }

@@ -1,3 +1,58 @@
-<p>
-  person-detail works!
-</p>
+<div class="card ">
+  <div class="card-header bg-dark text-white">
+    <div class="row">
+      <div class="col-sm-9">
+        <h3 class="no-margin">Person detail</h3>
+      </div>
+      <div class="col-sm-3 text-align-right">
+        <button class="btn btn-default" routerLink="/person/form/{{person.id}}" *ngIf="person != undefined && person.id != undefined">
+          <i class="fa fa-pencil-square-o"></i>
+        </button>
+        <button class="btn btn-default" routerLink="/person/list">
+          <i class="fa fa-list"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="card-body" *ngIf="ready">    
+    <div class="row">      
+      <div class="col-md-12">
+        <div class="row">
+            <div class="col-md-3">
+              <strong>Name</strong><br/>
+              {{person.name}}
+            </div>
+            <div class="col-md-3">
+              <strong>Last name</strong><br/>
+              {{person.lastName}}
+            </div>
+          <div class="col-md-3">
+            <strong>Number of document</strong><br/>
+            {{person.numberDocument}}
+          </div>
+          <div class="col-md-3">
+            <strong>E-mail</strong><br/>
+            {{person.email}}
+          </div>
+          <div class="col-md-3">
+            <strong>Gender</strong><br/>
+            {{person.phone}}
+          </div>
+          <div class="col-md-3">
+            <strong>Gender</strong><br/>
+            {{person.gender}}
+          </div>
+          <div class="col-md-3">
+            <strong>Created at</strong><br/>
+            {{person.createdAt | date:'dd MMM yyyy' }}
+          </div>
+          <div class="col-md-3">
+            <strong>Modified at</strong><br/>
+            {{person.modifiedAt | date:'dd MMM yyyy' }}
+          </div>
+        </div>
+      </div>
+    </div>    
+  </div>  
+</div>
+
