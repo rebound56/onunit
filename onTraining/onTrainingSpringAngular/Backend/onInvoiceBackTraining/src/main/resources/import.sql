@@ -22,4 +22,7 @@ INSERT INTO person (name, last_name, email, phone, number_document, gender, crea
 
 INSERT INTO person (name, last_name, email, phone, number_document, gender, created_at, modified_at) VALUES  ('Lina', 'Escobar', 'lina.escobar@gmail.com', '3433434', '7889998', 'F','2017-03-01', '2018-03-02');
 
+INSERT INTO product (name, description, gross_price_per_unit, gross_taxes_per_unit, created_at , modified_at) VALUES ('TV SAMSUNG 55', 'Smart tv of 55', 3220 , 80, NOW(), NOW());
+INSERT INTO product (name, description, gross_price_per_unit, gross_taxes_per_unit, created_at , modified_at) VALUES ('LAPTOP LENOVO', 'Laptop lenovo i7', 1510 , 90, NOW(), NOW());
+INSERT INTO product (name, description, gross_price_per_unit, gross_taxes_per_unit, created_at , modified_at) VALUES ('MOUNTAIN BIKE', 'Mountain bike', 1208 , 42, NOW(), NOW());
 
