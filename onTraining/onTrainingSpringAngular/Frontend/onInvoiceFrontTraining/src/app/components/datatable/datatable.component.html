@@ -5,7 +5,7 @@
             <h3 class="no-margin">{{title}}</h3>
         </div>
         <div class="col-3 text-align-right">
-          <div class="datatable-records">
+          <div class="datatable-records" *ngIf="pageable.numberOfElements != undefined">
             {{pageable.numberOfElements}}/{{pageable.totalElements}}
           </div>
         </div>

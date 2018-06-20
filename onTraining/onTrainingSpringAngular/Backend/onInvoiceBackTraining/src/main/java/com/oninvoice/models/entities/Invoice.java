@@ -22,6 +22,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Entity
 @Table
 public class Invoice implements Serializable {
@@ -65,6 +67,7 @@ public class Invoice implements Serializable {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "person_id")
+	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 	private Person person;
 
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -199,6 +202,7 @@ public class Invoice implements Serializable {
 	@PrePersist
 	public void prePersist() {
 		this.createdAt = new Date();
+		this.code = String.valueOf(new Date().getTime());
 		preUpdate();
 	}
 

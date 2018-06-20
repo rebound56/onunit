@@ -15,6 +15,8 @@ import { ReactiveFormsModule } from "@angular/forms";
 import { HttpClientModule } from '@angular/common/http';
 import { PersonService } from './services/person.service';
 import { DatatableComponent } from './components/datatable/datatable.component';
+import { PersonViewComponent } from './components/person-view/person-view.component';
+import { PersonInvoiceListComponent } from './components/person-invoice-list/person-invoice-list.component';
 
 @NgModule({
   declarations: [
@@ -22,7 +24,9 @@ import { DatatableComponent } from './components/datatable/datatable.component';
     PersonListComponent,
     PersonFormComponent,
     PersonDetailComponent,
-    DatatableComponent
+    DatatableComponent,
+    PersonViewComponent,
+    PersonInvoiceListComponent
   ],
   imports: [
     BrowserModule,
