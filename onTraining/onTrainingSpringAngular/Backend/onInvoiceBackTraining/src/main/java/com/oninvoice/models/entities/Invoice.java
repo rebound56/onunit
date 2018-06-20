@@ -40,9 +40,6 @@ public class Invoice implements Serializable {
 	private String code;
 
 	@Column
-	private String description;
-
-	@Column
 	private String comments;
 
 	@Column(name = "total_price_taxes")
@@ -90,13 +87,7 @@ public class Invoice implements Serializable {
 		this.code = code;
 	}
 
-	public String getDescription() {
-		return description;
-	}
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
 
 	public String getComments() {
 		return comments;
@@ -166,12 +157,12 @@ public class Invoice implements Serializable {
 		super();
 	}
 
+
 	@Override
 	public String toString() {
-		return "Invoice [id=" + id + ", code=" + code + ", description=" + description + ", comments=" + comments
-				+ ", totalPriceTaxes=" + totalPriceTaxes + ", totalGrossPrice=" + totalGrossPrice + ", total=" + total
-				+ ", createdAt=" + createdAt + ", modifiedAt=" + modifiedAt + ", person=" + person + ", listItem="
-				+ listItem + "]";
+		return "Invoice [id=" + id + ", code=" + code + ", comments=" + comments + ", totalPriceTaxes="
+				+ totalPriceTaxes + ", totalGrossPrice=" + totalGrossPrice + ", total=" + total + ", createdAt="
+				+ createdAt + ", modifiedAt=" + modifiedAt + ", person=" + person + ", listItem=" + listItem + "]";
 	}
 
 	@Override

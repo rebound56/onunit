@@ -1,0 +1,79 @@
+<form [formGroup]="formInvoice" (ngSubmit)="save()" *ngIf="ready">
+    <div class="card " *ngIf="ready">
+        <div class="card-header bg-dark text-white">
+            <div class="row">
+              <div class="col-sm-9">
+                <h3 class="no-margin">Invoice form</h3>
+              </div>
+              <div class="col-sm-3 text-align-right" >
+                <button class="btn btn-default" routerLink="/person/detail/{{idPerson}}">
+                  <i class="fa fa-list"></i>
+                </button>                
+              </div>
+            </div>
+        </div>
+        <div class="card-body">
+          <div class="row">  
+            
+
+            <div class="col-md-12">
+                <ul class="list-group">
+                  <li *ngFor="let item of invoice.listItem" class="list-group-item">
+                    <div class="row">                      
+                      <div class="col-md-2">
+                        <div class="form-group" [ngClass]="{'has-error': hasErrors(item.controlAmount)}">   
+                          <label for="name" class="form-control-label">Amount</label>
+                          <input type="number" class="form-control" placeholder="Amount" [formControlName]="item.keyControlAmount" [(ngModel)]="item.amount" />
+                          <div class="form-control-feedback">
+                            <small *ngIf="hasError(item.controlAmount,'required')">Amount is required</small>
+                            <small *ngIf="hasError(item.controlAmount,'number')">Amount must be numeric</small>
+                            <small *ngIf="hasError(item.controlAmount,'min')">Amount must be minimum 1</small>
+                          </div>      
+                        </div>
+                      </div>
+
+                      <div class="col-md-4">
+                          <div class="form-group" [ngClass]="{'has-error': hasErrors(item.controlProduct)}">   
+                            <label for="name" class="form-control-label">Product</label>
+                            <input type="text" class="form-control" placeholder="Product" [formControlName]="item.keyControlProduct" [(ngModel)]="item.product.name" />
+                            <div class="form-control-feedback">
+                              <small *ngIf="hasError(item.controlProduct,'required')">Product is required</small>                              
+                            </div>      
+                          </div>
+                      </div>
+
+
+                    </div>
+                  </li>   
+                  <li class="list-group-item  text-align-right" >
+                      <button type="button" class="btn btn-primary" (click)="addItem()">
+                        <i class="fa fa-plus"></i>
+                      </button>
+                  </li>
+                  <li class="list-group-item" >
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group" [ngClass]="{'has-error': hasErrors(controlComments)}">      
+                          <label for="comments" class="form-control-label">Comments</label>
+                          <textarea class="form-control" name="comments" id="comments" placeholder="Comments" formControlName="controlComments" [(ngModel)]="invoice.comments"></textarea>                
+                          <div class="form-control-feedback">
+                              <small *ngIf="hasError(controlComments,'maxlength')">Comments must be lesser than 500 characters long</small>
+                          </div> 
+                        </div>
+                      </div>
+                    </div>
+                  </li>           
+                </ul>                
+            </div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <div class="row">
+            <div class="col-md-10">&nbsp;</div>
+            <div class="col-md-2">
+              <button type="submit" class="btn btn-success form-control">Save</button>
+            </div>         
+          </div>
+        </div>
+    </div>
+</form>

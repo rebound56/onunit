@@ -33,4 +33,14 @@ public class InvoiceService implements IInvoiceService {
 		return invoiceDao.findAll(pageable);
 	}
 
+	@Override
+	public Invoice findById(Long id) {
+		return this.invoiceDao.findById(id).get();
+	}
+
+	@Override
+	public void delete(Invoice invoice) {
+		this.invoiceDao.delete(invoice);
+	}
+
 }

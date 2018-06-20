@@ -17,6 +17,8 @@ import { PersonService } from './services/person.service';
 import { DatatableComponent } from './components/datatable/datatable.component';
 import { PersonViewComponent } from './components/person-view/person-view.component';
 import { PersonInvoiceListComponent } from './components/person-invoice-list/person-invoice-list.component';
+import { InvoiceService } from './services/invoice.service';
+import { InvoiceFormComponent } from './components/invoice-form/invoice-form.component';
 
 @NgModule({
   declarations: [
@@ -26,7 +28,8 @@ import { PersonInvoiceListComponent } from './components/person-invoice-list/per
     PersonDetailComponent,
     DatatableComponent,
     PersonViewComponent,
-    PersonInvoiceListComponent
+    PersonInvoiceListComponent,
+    InvoiceFormComponent
   ],
   imports: [
     BrowserModule,
@@ -38,7 +41,7 @@ import { PersonInvoiceListComponent } from './components/person-invoice-list/per
     ReactiveFormsModule,
     HttpClientModule
   ],
-  providers: [PersonService],
+  providers: [PersonService, InvoiceService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

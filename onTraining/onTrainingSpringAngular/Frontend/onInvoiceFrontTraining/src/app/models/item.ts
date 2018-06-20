@@ -1,4 +1,5 @@
 import { Product } from "./product";
+import { FormControl } from "@angular/forms/src/model";
 
 export class Item {
     id : number;
@@ -9,4 +10,18 @@ export class Item {
     totalGrossPrice : number;
     total : number;
     product : Product;
+    
+    // frontend variables    
+    nameControlItem: string; 
+
+    controlAmount : FormControl;
+    keyControlAmount: string;
+
+    controlProduct : FormControl;
+    keyControlProduct: string;
+
+
+
+
+
 }

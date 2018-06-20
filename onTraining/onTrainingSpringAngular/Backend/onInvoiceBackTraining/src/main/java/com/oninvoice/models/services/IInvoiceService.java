@@ -25,6 +25,21 @@ public interface IInvoiceService {
 	public Page<Invoice> findByPersonId(Long id, Pageable pageable);
 
 	/**
+	 * This method returns an Invoice by id
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public Invoice findById(Long id);
+
+	/**
+	 * This method deletes an invoice
+	 * 
+	 * @param invoice
+	 */
+	public void delete(Invoice invoice);
+
+	/**
 	 * THis method saves an invoice
 	 * 
 	 * @param invoice

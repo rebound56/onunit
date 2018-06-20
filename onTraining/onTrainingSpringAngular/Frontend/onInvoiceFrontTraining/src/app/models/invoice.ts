@@ -3,7 +3,6 @@ import { Person } from "./person";
 export class Invoice {
     id : number;
     code : string;
-    description : string;
     comments : string;
     totalPriceTaxes : number;
     totalGrossPrice : number;
