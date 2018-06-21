@@ -19,6 +19,7 @@ import { PersonViewComponent } from './components/person-view/person-view.compon
 import { PersonInvoiceListComponent } from './components/person-invoice-list/person-invoice-list.component';
 import { InvoiceService } from './services/invoice.service';
 import { InvoiceFormComponent } from './components/invoice-form/invoice-form.component';
+import { ProductService } from './services/product.service';
 
 @NgModule({
   declarations: [
@@ -41,7 +42,7 @@ import { InvoiceFormComponent } from './components/invoice-form/invoice-form.com
     ReactiveFormsModule,
     HttpClientModule
   ],
-  providers: [PersonService, InvoiceService],
+  providers: [PersonService, InvoiceService, ProductService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -13,7 +13,7 @@ import com.oninvoice.models.entities.Invoice;
 public class InvoiceService implements IInvoiceService {
 
 	@Autowired
-	IInvoiceDao invoiceDao;
+	private IInvoiceDao invoiceDao;
 
 	@Transactional(readOnly = true)
 	@Override

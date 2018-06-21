@@ -35,3 +35,16 @@
 .margin-bottom{
     margin-bottom:25px;
 }
+.autocomplete{
+    position:relative;    
+}
+.autocomplete-items{
+    position: absolute;
+    border-bottom: none;
+    border-top: none;
+    z-index: 99;
+    top: 100%;
+    left: 0;
+    right: 0;
+    cursor:pointer;
+}

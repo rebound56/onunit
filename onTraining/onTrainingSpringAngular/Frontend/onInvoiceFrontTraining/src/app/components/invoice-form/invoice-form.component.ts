@@ -13,6 +13,8 @@ import { Item } from '../../models/item';
 import { StringUtil } from '../../utils/string-util';
 import { CustomValidator } from '../../utils/custom-validator';
 import { Product } from '../../models/product';
+import { ProductService } from '../../services/product.service';
+import { setTimeout } from 'timers';
 
 @Component({
   selector: 'app-invoice-form',
@@ -29,14 +31,31 @@ export class InvoiceFormComponent implements OnInit {
   controlDescription : FormControl;
   controlComments : FormControl;
 
+  totalProductList : Array<Product> = [];
+  productList : Array<Product> = [];
+
+
   constructor(private personservice :PersonService, private activatedRoute: ActivatedRoute, 
-      private invoiceService: InvoiceService, private toasterService : ToasterService) {
+      private invoiceService: InvoiceService, private toasterService : ToasterService, 
+      private productService : ProductService) {
+
     this.idPerson = this.activatedRoute.snapshot.params["idPerson"];
     this.id = this.activatedRoute.snapshot.params["id"];
+
   }
 
   ngOnInit() {
       this.initInvoice();
+      this.initProduct();
+  }
+
+  /** this method intializes the total product list */
+  initProduct(){
+    this.productService.getAll().subscribe((result : Array<Product>) => {
+      this.totalProductList = result;
+    }, (error) => {
+      this.toasterService.pop('error', 'Error', 'it was not possible to load products');
+    });
   }
 
   /** this method intializes a form */
@@ -168,4 +187,35 @@ export class InvoiceFormComponent implements OnInit {
       this.invoice.listItem = [];
     this.invoice.listItem.push(item);
   }
+
+  autocomplete(event){
+    let scope = this;
+    this.productList = [];
+    let value = event.srcElement.value;
+    if(value && value.length && value.length >= 3){
+      this.totalProductList.forEach(function (product) {
+        if(product.name.toLowerCase().indexOf(value.toLowerCase()) >= 0 ){
+          scope.productList.push(product);
+        }
+      });
+    }
+  }
+
+  selectProduct(item :Item , product:Product){
+    item.product=product;
+    item.controlProduct.setValue(product.name);    
+    this.productList = [];       
+  }
+
+  onBlurAutoComplete(event, item:Item){
+    setTimeout(() => {
+      let value = event.srcElement.value;
+      if(!(item.product && item.product.name && item.product.name === value)){
+        item.product = undefined;
+        item.controlProduct.setValue('');
+        this.productList = [];
+      }      
+    },500);    
+  }
+
 }

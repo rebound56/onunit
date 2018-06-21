@@ -20,8 +20,4 @@ export class Item {
     controlProduct : FormControl;
     keyControlProduct: string;
 
-
-
-
-
 }

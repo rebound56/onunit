@@ -33,12 +33,20 @@
                       </div>
 
                       <div class="col-md-4">
-                          <div class="form-group" [ngClass]="{'has-error': hasErrors(item.controlProduct)}">   
-                            <label for="name" class="form-control-label">Product</label>
-                            <input type="text" class="form-control" placeholder="Product" [formControlName]="item.keyControlProduct" [(ngModel)]="item.product.name" />
+                          <div class="form-group" [ngClass]="{'has-error': hasErrors(item.controlProduct)}" >   
+                            <label for="name" class="form-control-label">Product</label>                            
+                            <div class="autocomplete">
+                                <input type="text" class="form-control" placeholder="Product" [formControlName]="item.keyControlProduct" (keyup)="autocomplete($event)" (blur)="onBlurAutoComplete($event,item)" />
+                                <div class="list-group autocomplete-items">
+                                  <button type="button" *ngFor="let product of productList" class="list-group-item list-group-item-action" (click)="selectProduct(item,product)">
+                                    {{product.name}}
+                                  </button>
+                                </div> 
+                            </div>
                             <div class="form-control-feedback">
                               <small *ngIf="hasError(item.controlProduct,'required')">Product is required</small>                              
-                            </div>      
+                            </div>
+                              
                           </div>
                       </div>
 

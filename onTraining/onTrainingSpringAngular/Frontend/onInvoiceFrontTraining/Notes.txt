@@ -90,4 +90,10 @@
         ReactiveFormsModule,
         HttpClientModule
         ...
-    
+9) add ng -bootstrap
+    - execute 
+        > npm install --save @ng-bootstrap/ng-bootstrap
+    - app.module.ts
+        import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+        ...
+        imports: [NgbModule, ...]

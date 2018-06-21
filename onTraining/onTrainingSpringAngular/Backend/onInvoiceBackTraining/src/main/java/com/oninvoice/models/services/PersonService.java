@@ -12,7 +12,7 @@ import com.oninvoice.models.entities.Person;
 @Service
 public class PersonService implements IPersonService {
 	@Autowired
-	IPersonDao personDao;
+	private IPersonDao personDao;
 
 	@Override
 	@Transactional(readOnly=true)

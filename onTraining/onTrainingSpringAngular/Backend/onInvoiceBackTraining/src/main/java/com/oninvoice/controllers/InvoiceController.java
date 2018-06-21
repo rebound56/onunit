@@ -29,7 +29,7 @@ import com.oninvoice.util.ErrorMessage;
 public class InvoiceController {
 
 	@Autowired
-	IInvoiceService invoiceService;
+	private IInvoiceService invoiceService;
 
 	@GetMapping(value = "/get/person/{id}")
 	public ResponseEntity<?> getByPersonId(@PathVariable(name = "id") Long id,
