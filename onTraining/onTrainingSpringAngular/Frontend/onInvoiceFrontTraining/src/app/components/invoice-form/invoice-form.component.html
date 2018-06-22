@@ -3,7 +3,7 @@
         <div class="card-header bg-dark text-white">
             <div class="row">
               <div class="col-sm-9">
-                <h3 class="no-margin">Invoice form</h3>
+                <h3 class="no-margin">Invoice form <span *ngIf="invoice.code != null"># {{invoice.code}}</span></h3>
               </div>
               <div class="col-sm-3 text-align-right" >
                 <button class="btn btn-default" routerLink="/invoice/{{idPerson}}/detail/{{id}}" *ngIf="id != undefined">
@@ -16,23 +16,31 @@
             </div>
         </div>
         <div class="card-body">
-          <div class="row">  
-            
-
+          <div class="row">
             <div class="col-md-12">
                 <ul class="list-group list-group-flush">
-                  <li class="list-group-item active d-none d-md-block">
-                    <div class="row">                      
-                      <div class="col-md-4 text-align-center">
-                        Product
+                  <li class="list-group-item active">
+                    <div class="row"> 
+
+                      <div class="col-md-4 text-align-center">                       
+                        <div class="form-group">                                                    
+                          <div class="autocomplete">
+                              <input type="text" class="form-control" placeholder="Search product" (keyup)="autocomplete($event)" (blur)="onBlurAutoComplete($event)" />
+                              <div class="list-group autocomplete-items">
+                                <button type="button" *ngFor="let product of productList" class="list-group-item list-group-item-action text-align-left" (click)="selectProduct(product)">
+                                  {{product.name}}
+                                </button>
+                              </div> 
+                          </div>                                              
+                        </div>
                       </div>
-                      <div class="col-md-2 text-align-center">
+                      <div class="col-md-2 text-align-center d-none d-md-block">
                         Amount
                       </div>
-                      <div class="col-md-2 text-align-center">
+                      <div class="col-md-2 text-align-center d-none d-md-block">
                         Price per unit
                       </div>
-                      <div class="col-md-2 text-align-center">
+                      <div class="col-md-2 text-align-center d-none d-md-block">
                         Total price
                       </div>
                     </div>
@@ -40,21 +48,7 @@
                   <li *ngFor="let item of invoice.listItem" class="list-group-item">
                     <div class="row">
                       <div class="col-md-4">
-                          <div class="form-group" [ngClass]="{'has-error': hasErrors(item.controlProduct)}" >   
-                            <label class="form-control-label d-block d-md-none">Product</label>                            
-                            <div class="autocomplete">
-                                <input type="text" class="form-control" placeholder="Product" [formControlName]="item.keyControlProduct" (keyup)="autocomplete($event,item)" (blur)="onBlurAutoComplete($event,item)" />
-                                <div class="list-group autocomplete-items">
-                                  <button type="button" *ngFor="let product of item.productList" class="list-group-item list-group-item-action" (click)="selectProduct(item,product)">
-                                    {{product.name}}
-                                  </button>
-                                </div> 
-                            </div>
-                            <div class="form-control-feedback">
-                              <small *ngIf="hasError(item.controlProduct,'required')">Product is required</small>                              
-                            </div>
-                              
-                          </div>
+                          {{item.product.name}}
                       </div>
 
                       <div class="col-md-2">
@@ -88,7 +82,7 @@
                         </div>
                       
                       <div class="col-md-2 text-align-right">
-                          <button type="button" class="btn btn-danger" *ngIf="invoice.listItem.length > 1" (click)="removeControlItem(item)">
+                          <button type="button" class="btn btn-danger" (click)="removeControlItem(item)">
                             <i class="fa fa-trash"></i>
                           </button>
                       </div>
@@ -113,12 +107,7 @@
                         <div class="text-align-right">
                           <strong>{{getTotal() | currency}}</strong>
                         </div>
-                      </div>
-                      <div class="col-md-2 text-align-right">
-                        <button type="button" class="btn btn-primary" (click)="addItem()">
-                          <i class="fa fa-plus"></i>
-                        </button>
-                      </div>                     
+                      </div>                                        
                     </div>
                   </li>
                   <li class="list-group-item" >

@@ -17,6 +17,7 @@ import { ProductService } from '../../services/product.service';
 import { Router } from '@angular/router';
 
 
+
 @Component({
   selector: 'app-invoice-form',
   templateUrl: './invoice-form.component.html',
@@ -29,11 +30,10 @@ export class InvoiceFormComponent implements OnInit {
   id : number;
 
   formInvoice : FormGroup;
-  controlDescription : FormControl;
-  controlComments : FormControl;
+  controlComments : FormControl; 
 
   totalProductList : Array<Product> = [];
-  
+  productList : Array<Product> = [];
 
 
   constructor(private personservice :PersonService, private activatedRoute: ActivatedRoute, 
@@ -92,8 +92,7 @@ export class InvoiceFormComponent implements OnInit {
         this.personservice.get(this.idPerson).subscribe((person:Person) => {          
           let invoice = new Invoice();
           invoice.person = person;          
-          this.initForm(invoice);
-          this.addItem();
+          this.initForm(invoice);         
         }, error => {
           if(error.status == 404){
             this.toasterService.pop('error', 'Error', 'Person is not found');
@@ -104,7 +103,7 @@ export class InvoiceFormComponent implements OnInit {
 
       }else{
 
-        this.invoiceService.get(this.id).subscribe((invoice: any)=> {
+        this.invoiceService.get(this.id).subscribe((invoice: Invoice)=> {
           if(this.idPerson != invoice.person.id)
             this.toasterService.pop('error', 'Error', 'Id person does not match with the invoice person');
           else{
@@ -135,9 +134,11 @@ export class InvoiceFormComponent implements OnInit {
   save () {    
     if(!this.formInvoice.valid)
       FormUtil.validateFormFields(this.formInvoice);
-    else{      
+    else if(this.invoice.listItem == undefined || this.invoice.listItem.length ==0){ 
+      this.toasterService.pop('warning', 'Products are required', 'Please search product');
+    }else{      
       this.invoiceService.save(this.invoice).subscribe((result : Invoice)=> {        
-          this.toasterService.pop('success', 'Invoice saved', 'The invoice has been saved successfully');                          
+          this.toasterService.pop('success', 'Invoice saved', 'The invoice has been saved successfully');
           this.router.navigate(['/invoice/'+this.idPerson+'/detail/'+result.id]);        
       }, (error) =>{
         this.toasterService.pop('error', "Error", 'It was not possible to save the invoice');        
@@ -155,28 +156,13 @@ export class InvoiceFormComponent implements OnInit {
       Validators.required,
       Validators.min(1),
       CustomValidator.number()
-    ]);    
-    
-    if(item.product == undefined )
-      item.product = new Product();
-
-    let product: FormControl = new FormControl(item.product.name);
-    product.setValidators([
-      Validators.required      
     ]);
-
-
-    item.controlProduct = product;
-    item.controlAmount = amount;
-
-    item.keyControlAmount = item.nameControlItem + '_amount';
-    item.keyControlProduct = item.nameControlItem + '_product';
-
-    this.formInvoice.addControl(item.keyControlAmount, item.controlAmount);
-    this.formInvoice.addControl(item.keyControlProduct, item.controlProduct);
     
+    
+    item.controlAmount = amount;
+    item.keyControlAmount = item.nameControlItem + '_amount';
+    this.formInvoice.addControl(item.keyControlAmount, item.controlAmount);
     item.toJSON  = new Item().toJSON;
-
     return item;
   }
 
@@ -185,8 +171,7 @@ export class InvoiceFormComponent implements OnInit {
     for(let i=0; i< this.invoice.listItem.length ; i++){
       let element: Item = this.invoice.listItem[i];
       if(element.nameControlItem === item.nameControlItem){
-        this.formInvoice.removeControl(item.keyControlAmount);
-        this.formInvoice.removeControl(item.keyControlProduct);
+        this.formInvoice.removeControl(item.keyControlAmount);        
       }else{
         arrayItem.push(element);
       }
@@ -194,44 +179,51 @@ export class InvoiceFormComponent implements OnInit {
     this.invoice.listItem = arrayItem;
   }
 
-  addItem(){
-    let item : Item = new Item();
-    item = this.addControlItem(item);
-    
-    if(this.invoice.listItem == undefined)
-      this.invoice.listItem = [];
-    this.invoice.listItem.push(item);
+ 
 
-  }
-
-  autocomplete(event,item:Item){
-  
-    item.productList = [];
+  autocomplete(event){
+    let scope = this;
+    this.productList = [];
     let value = event.srcElement.value;
-    if(value && value.length && value.length >= 3){
+    if(value && value.length && value.length >= 2){
       this.totalProductList.forEach(function (product) {
         if(product.name.toLowerCase().indexOf(value.toLowerCase()) >= 0 ){
-          item.productList.push(product);
+          scope.productList.push(product);
         }
       });
     }
   }
 
-  selectProduct(item :Item , product:Product){
-    item.product=product;
-    item.controlProduct.setValue(product.name);    
-    item.productList = [];       
+  selectProduct(product:Product){
+    
+    let item : Item;
+    if(!this.invoice.listItem)
+      this.invoice.listItem = [];
+
+    this.invoice.listItem.forEach((element: Item) => {
+      if(element.product.id == product.id){
+        item = element;
+        if(item.amount == undefined || item.amount <= 0)
+          item.amount=1
+        else
+          item.amount++;
+
+      }
+    });
+    if(item == undefined){
+      item = new Item();
+      item.amount =1
+      item.product = product;
+      this.invoice.listItem.push(item);
+      this.addControlItem(item);
+    }              
   }
 
-  onBlurAutoComplete(event, item:Item){
-    setTimeout(() => {   
-      let value = event.srcElement.value;
-      if(!(item.product && item.product.name && item.product.name === value)){
-        item.product = undefined;
-        item.controlProduct.setValue('');
-        item.productList = [];
-      }      
-    },500);    
+  onBlurAutoComplete(event){
+    setTimeout(() => {
+      this.productList = [];
+      event.srcElement.value='';
+    },100);    
   }
 
   getTotal() : number{

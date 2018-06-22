@@ -15,9 +15,7 @@ export class Item {
     nameControlItem: string;
     controlAmount : FormControl;
     keyControlAmount: string;
-    controlProduct : FormControl;
-    keyControlProduct: string;
-    productList : Array<Product> = [];
+
 
     toJSON(){
         return {        
