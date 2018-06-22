@@ -16,7 +16,7 @@ export class FormUtil {
     
     /** It validates if a formcontrol has any error */
     static hasErrors(formControl : FormControl){
-        return formControl.errors && (formControl.dirty || formControl.touched);
+        return formControl && formControl.errors && (formControl.dirty || formControl.touched);
     } 
 
     /** It validates if a formcontrol has a specific error */

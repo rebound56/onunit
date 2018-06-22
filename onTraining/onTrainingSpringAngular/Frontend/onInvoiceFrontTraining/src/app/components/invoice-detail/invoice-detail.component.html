@@ -1,0 +1,85 @@
+<div class="card " *ngIf="ready">
+  <div class="card-header bg-dark text-white">
+      <div class="row">
+        <div class="col-sm-9">
+          <h3 class="no-margin">Invoice # {{invoice.code}}</h3>
+        </div>
+        <div class="col-sm-3 text-align-right" >
+          <button class="btn btn-default" routerLink="/invoice/{{idPerson}}/form/{{id}}">
+            <i class="fa fa-pencil-square-o"></i>
+          </button>  
+          <button class="btn btn-default" routerLink="/person/detail/{{idPerson}}">
+            <i class="fa fa-list"></i>
+          </button>                
+        </div>
+      </div>
+  </div>
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-12">
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item active d-none d-md-block">
+              <div class="row">                      
+                <div class="col-md-2 text-align-center">
+                  Product
+                </div>
+                <div class="col-md-2 text-align-center">
+                  Amount
+                </div>
+                <div class="col-md-2 text-align-center">
+                  Gross price
+                </div>
+                <div class="col-md-2 text-align-center">
+                  Taxes price
+                </div>
+                <div class="col-md-2 text-align-center">
+                  Total price
+                </div>
+              </div>
+            </li>
+            <li *ngFor="let item of invoice.listItem" class="list-group-item">
+              <div class="row">   
+                <div class="col-md-2">                    
+                  <label class="form-control-label d-block d-md-none">Product</label>                            
+                  <div class="">{{item.product.name}}</div>                                     
+                </div>                   
+                <div class="col-md-2">                    
+                  <label class="form-control-label d-block d-md-none">Amount</label>
+                  <div class="text-align-right">{{item.amount}}</div>               
+                </div>
+                <div class="col-md-2">                    
+                  <label class="form-control-label d-block d-md-none">Gross price</label>
+                  <div class="text-align-right">{{item.totalGrossPrice | currency}}</div>               
+                </div>
+                <div class="col-md-2">                    
+                  <label class="form-control-label d-block d-md-none">Taxes price</label>
+                  <div class="text-align-right">{{item.totalPriceTaxes | currency}}</div>               
+                </div>
+                <div class="col-md-2">                    
+                  <label class="form-control-label d-block d-md-none">Total</label>
+                  <div class="text-align-right">{{item.total | currency}}</div>               
+                </div>
+              </div>
+            </li>
+            <li class="list-group-item">
+              <div class="row"> 
+                <div class="offset-md-4 col-md-2">                    
+                  <label class="form-control-label d-block d-md-none">Total gross price</label>
+                  <div class="text-align-right"><strong>{{invoice.totalGrossPrice | currency}}</strong></div>
+                </div>
+                <div class="col-md-2">                    
+                  <label class="form-control-label d-block d-md-none">Total taxes price</label>
+                  <div class="text-align-right"><strong>{{invoice.totalPriceTaxes | currency}}</strong></div>               
+                </div>
+                <div class="col-md-2">                    
+                  <label class="form-control-label d-block d-md-none">Total</label>
+                  <div class="text-align-right"><strong>{{invoice.total | currency}}</strong></div>               
+                </div>
+              </div>
+            </li>            
+          </ul>                
+      </div>
+    </div>
+  </div>  
+</div>
+

@@ -14,7 +14,8 @@ import { StringUtil } from '../../utils/string-util';
 import { CustomValidator } from '../../utils/custom-validator';
 import { Product } from '../../models/product';
 import { ProductService } from '../../services/product.service';
-import { setTimeout } from 'timers';
+import { Router } from '@angular/router';
+
 
 @Component({
   selector: 'app-invoice-form',
@@ -32,12 +33,12 @@ export class InvoiceFormComponent implements OnInit {
   controlComments : FormControl;
 
   totalProductList : Array<Product> = [];
-  productList : Array<Product> = [];
+  
 
 
   constructor(private personservice :PersonService, private activatedRoute: ActivatedRoute, 
       private invoiceService: InvoiceService, private toasterService : ToasterService, 
-      private productService : ProductService) {
+      private productService : ProductService, private router : Router) {
 
     this.idPerson = this.activatedRoute.snapshot.params["idPerson"];
     this.id = this.activatedRoute.snapshot.params["id"];
@@ -134,17 +135,20 @@ export class InvoiceFormComponent implements OnInit {
   save () {    
     if(!this.formInvoice.valid)
       FormUtil.validateFormFields(this.formInvoice);
-    else{
-      this.invoiceService.save(this.invoice).subscribe((result : any)=> {        
-          this.toasterService.pop('success', 'Invoice saved', 'The invoice has been saved successfully');                 
+    else{      
+      this.invoiceService.save(this.invoice).subscribe((result : Invoice)=> {        
+          this.toasterService.pop('success', 'Invoice saved', 'The invoice has been saved successfully');                          
+          this.router.navigate(['/invoice/'+this.idPerson+'/detail/'+result.id]);        
       }, (error) =>{
-        this.toasterService.pop('error', "Error", 'It was not possible to save the invoice');
+        this.toasterService.pop('error', "Error", 'It was not possible to save the invoice');        
       });
     }
   }
-  
+
+
+   
   private addControlItem(item : Item) : Item{
-    item.nameControlItem = 'item_'+StringUtil.getStringTime(null);  
+    item.nameControlItem = 'item_'+StringUtil.getRandomString();  
 
     let amount: FormControl = new FormControl(item.amount);
     amount.setValidators([
@@ -169,33 +173,45 @@ export class InvoiceFormComponent implements OnInit {
     item.keyControlProduct = item.nameControlItem + '_product';
 
     this.formInvoice.addControl(item.keyControlAmount, item.controlAmount);
-    this.formInvoice.addControl(item.keyControlProduct, item.controlProduct)
-
+    this.formInvoice.addControl(item.keyControlProduct, item.controlProduct);
+    
+    item.toJSON  = new Item().toJSON;
 
     return item;
   }
 
   private removeControlItem(item : Item){
-    this.formInvoice.removeControl(item.keyControlAmount);
-    this.formInvoice.removeControl(item.keyControlProduct);
+    let arrayItem = [];
+    for(let i=0; i< this.invoice.listItem.length ; i++){
+      let element: Item = this.invoice.listItem[i];
+      if(element.nameControlItem === item.nameControlItem){
+        this.formInvoice.removeControl(item.keyControlAmount);
+        this.formInvoice.removeControl(item.keyControlProduct);
+      }else{
+        arrayItem.push(element);
+      }
+    }
+    this.invoice.listItem = arrayItem;
   }
 
   addItem(){
     let item : Item = new Item();
     item = this.addControlItem(item);
+    
     if(this.invoice.listItem == undefined)
       this.invoice.listItem = [];
     this.invoice.listItem.push(item);
+
   }
 
-  autocomplete(event){
-    let scope = this;
-    this.productList = [];
+  autocomplete(event,item:Item){
+  
+    item.productList = [];
     let value = event.srcElement.value;
     if(value && value.length && value.length >= 3){
       this.totalProductList.forEach(function (product) {
         if(product.name.toLowerCase().indexOf(value.toLowerCase()) >= 0 ){
-          scope.productList.push(product);
+          item.productList.push(product);
         }
       });
     }
@@ -204,18 +220,30 @@ export class InvoiceFormComponent implements OnInit {
   selectProduct(item :Item , product:Product){
     item.product=product;
     item.controlProduct.setValue(product.name);    
-    this.productList = [];       
+    item.productList = [];       
   }
 
   onBlurAutoComplete(event, item:Item){
-    setTimeout(() => {
+    setTimeout(() => {   
       let value = event.srcElement.value;
       if(!(item.product && item.product.name && item.product.name === value)){
         item.product = undefined;
         item.controlProduct.setValue('');
-        this.productList = [];
+        item.productList = [];
       }      
     },500);    
+  }
+
+  getTotal() : number{
+    let total : number = 0;
+    if(this.invoice != undefined && this.invoice.listItem != undefined){
+      this.invoice.listItem.forEach((item : Item) => {
+        if(item.amount !=undefined && item.amount >0 && item.product != undefined && item.product.id != undefined){
+          total = total + ((item.product.grossPricePerUnit + item.product.priceTaxesPerUnit) * item.amount)
+        }
+      });
+    }
+    return total;
   }
 
 }

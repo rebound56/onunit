@@ -12,12 +12,26 @@ export class Item {
     product : Product;
     
     // frontend variables    
-    nameControlItem: string; 
-
+    nameControlItem: string;
     controlAmount : FormControl;
     keyControlAmount: string;
-
     controlProduct : FormControl;
     keyControlProduct: string;
+    productList : Array<Product> = [];
+
+    toJSON(){
+        return {        
+            id: this.id,
+            amount: this.amount,
+            grossPricePerUnit: this.grossPricePerUnit,
+            priceTaxesPerUnit: this.priceTaxesPerUnit,
+            totalPriceTaxes: this.totalPriceTaxes,
+            totalGrossPrice: this.totalGrossPrice,
+            total: this.total,
+            product: this.product      
+        }
+    }
+
+
 
 }

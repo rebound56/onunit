@@ -20,6 +20,7 @@ import { PersonInvoiceListComponent } from './components/person-invoice-list/per
 import { InvoiceService } from './services/invoice.service';
 import { InvoiceFormComponent } from './components/invoice-form/invoice-form.component';
 import { ProductService } from './services/product.service';
+import { InvoiceDetailComponent } from './components/invoice-detail/invoice-detail.component';
 
 @NgModule({
   declarations: [
@@ -30,7 +31,8 @@ import { ProductService } from './services/product.service';
     DatatableComponent,
     PersonViewComponent,
     PersonInvoiceListComponent,
-    InvoiceFormComponent
+    InvoiceFormComponent,
+    InvoiceDetailComponent
   ],
   imports: [
     BrowserModule,

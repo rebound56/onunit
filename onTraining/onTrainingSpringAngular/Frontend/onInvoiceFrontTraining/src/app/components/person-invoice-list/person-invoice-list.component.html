@@ -19,10 +19,16 @@
           <td scope="row">{{invoice.description}}</td>
           <td scope="row">{{invoice.comments}}</td>
           <td scope="row">{{invoice.createdAt | date:'dd MMM yyyy' }}</td>              
-          <td scope="row" class="text-align-right">{{invoice.totalGrossPrice}}</td>
-          <td scope="row" class="text-align-right">{{invoice.totalPriceTaxes}}</td> 
-          <td scope="row" class="text-align-right">{{invoice.total}}</td>
-          <td scope="row" class="text-align-right">              
+          <td scope="row" class="text-align-right">{{invoice.totalGrossPrice | currency}}</td>
+          <td scope="row" class="text-align-right">{{invoice.totalPriceTaxes | currency}}</td> 
+          <td scope="row" class="text-align-right">{{invoice.total | currency}}</td>
+          <td scope="row" class="text-align-right">
+            <button class="btn btn-default" routerLink="/invoice/{{id}}/detail/{{invoice.id}}">
+              <i class="fa fa-eye"></i>
+            </button>  
+            <button class="btn btn-primary" routerLink="/invoice/{{id}}/form/{{invoice.id}}">
+              <i class="fa fa-pencil-square-o"></i>
+            </button>
           </td>
         </tr>
         <tr *ngIf="!pageable.content">

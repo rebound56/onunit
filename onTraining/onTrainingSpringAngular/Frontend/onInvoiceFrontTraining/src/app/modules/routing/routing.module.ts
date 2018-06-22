@@ -5,12 +5,14 @@ import { PersonFormComponent } from '../../components/person-form/person-form.co
 import { PersonListComponent } from '../../components/person-list/person-list.component';
 import { PersonDetailComponent } from '../../components/person-detail/person-detail.component';
 import { InvoiceFormComponent } from '../../components/invoice-form/invoice-form.component';
+import { InvoiceDetailComponent } from '../../components/invoice-detail/invoice-detail.component';
 
 const routes: Routes = [
   { path: 'person/form/:id', component: PersonFormComponent },
   { path: 'person/detail/:id', component: PersonDetailComponent },  
   { path: 'person/form', component: PersonFormComponent },
   { path: 'invoice/:idPerson/form/:id', component: InvoiceFormComponent },
+  { path: 'invoice/:idPerson/detail/:id', component: InvoiceDetailComponent },
   { path: 'invoice/:idPerson/form', component: InvoiceFormComponent },
   { path: 'person/list', component: PersonListComponent }
 ];
