@@ -80,6 +80,14 @@
           </ul>                
       </div>
     </div>
+    <div class="row" *ngIf="invoice.comments != undefined && invoice.comments.length > 0">
+      <div class="col-md-12">
+        <strong>Comments</strong>
+        <p class="card-text">
+          {{invoice.comments}}
+        </p>
+      </div>
+    </div>
   </div>  
 </div>
 

@@ -36,4 +36,15 @@ export class PersonInvoiceListComponent implements OnInit {
       this.ready = true;
     });    
   }
+
+  delete(id: number){
+    if(confirm('Are you sure you want to delete this invoice?')){
+      this.invoiceService.delete(id).subscribe((result)=> {
+        this.toasterService.pop('success', "Invoice deleted", 'Invoice has been deleted successfully');
+        this.initList(this.pageable)
+      } , (errror)=>{
+        this.toasterService.pop('error', "Error", 'It was not possible to delete the invoice');
+      });
+    }
+  }
 }
