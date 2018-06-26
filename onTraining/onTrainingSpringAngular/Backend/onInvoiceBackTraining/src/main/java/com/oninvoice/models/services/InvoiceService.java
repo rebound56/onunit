@@ -34,11 +34,13 @@ public class InvoiceService implements IInvoiceService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public Invoice findById(Long id) {
-		return this.invoiceDao.findById(id).get();
+		return this.invoiceDao.fetchByIdWithPersonWithListItemWithProduct(id);
 	}
 
 	@Override
+	@Transactional
 	public void delete(Invoice invoice) {
 		this.invoiceDao.delete(invoice);
 	}
