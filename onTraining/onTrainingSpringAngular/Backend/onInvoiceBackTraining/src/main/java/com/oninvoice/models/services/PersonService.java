@@ -6,11 +6,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.oninvoice.models.api.IPersonApi;
 import com.oninvoice.models.daos.IPersonDao;
 import com.oninvoice.models.entities.Person;
 
 @Service
-public class PersonService implements IPersonService {
+public class PersonService implements IPersonApi {
 	@Autowired
 	private IPersonDao personDao;
 

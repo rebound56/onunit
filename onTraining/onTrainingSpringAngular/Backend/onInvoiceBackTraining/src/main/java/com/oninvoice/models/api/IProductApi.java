@@ -1,10 +1,10 @@
-package com.oninvoice.models.services;
+package com.oninvoice.models.api;
 
 import java.util.List;
 
 import com.oninvoice.models.entities.Product;
 
-public interface IProductService {
+public interface IProductApi {
 	
 	/**
 	 * THis method returns a list of all products

@@ -18,17 +18,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
+import com.oninvoice.models.api.IPersonApi;
 import com.oninvoice.models.entities.Person;
-import com.oninvoice.models.services.IPersonService;
 import com.oninvoice.util.ErrorMessage;
 
-@Controller
+@RestController
 @RequestMapping("/person")
 public class PersonController {
 
 	@Autowired
-	private IPersonService personService;
+	private IPersonApi personService;
 
 	@GetMapping(value = "/get/all")
 	public ResponseEntity<Page<Person>> getAll(@RequestParam Map<String, String> mapRequest) {

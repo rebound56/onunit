@@ -8,15 +8,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+import com.oninvoice.models.api.IProductApi;
 import com.oninvoice.models.entities.Product;
-import com.oninvoice.models.services.IProductService;
 
-@Controller
+@RestController
 @RequestMapping(value = "/product")
 public class ProductController {
 	@Autowired
-	private IProductService productService;
+	private IProductApi productService;
 
 	@GetMapping(value = "/get/all")
 	public ResponseEntity<?> getAll() {

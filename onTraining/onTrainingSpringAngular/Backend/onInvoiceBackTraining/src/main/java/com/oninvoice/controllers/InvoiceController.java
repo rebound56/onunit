@@ -18,18 +18,19 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
+import com.oninvoice.models.api.IInvoiceApi;
 import com.oninvoice.models.entities.Invoice;
 import com.oninvoice.models.entities.Person;
-import com.oninvoice.models.services.IInvoiceService;
 import com.oninvoice.util.ErrorMessage;
 
-@Controller
+@RestController
 @RequestMapping(value = "/invoice")
 public class InvoiceController {
 
 	@Autowired
-	private IInvoiceService invoiceService;
+	private IInvoiceApi invoiceService;
 
 	@GetMapping(value = "/get/person/{id}")
 	public ResponseEntity<?> getByPersonId(@PathVariable(name = "id") Long id,

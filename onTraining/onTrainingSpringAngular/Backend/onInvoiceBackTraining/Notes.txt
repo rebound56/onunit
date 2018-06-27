@@ -283,6 +283,64 @@
             }
         }
 
+6) Optimizing queries
+    - if we leave queries without optimization , the orm will execute more than one query. Therefore, it is very important to optimize queries
+        - Example
+            @Query(value="SELECT i FROM Invoice i JOIN FETCH i.person p JOIN FETCH i.listItem l JOIN FETCH l.product WHERE i.id = :id")
+	        public Invoice fetchByIdWithPersonWithListItemWithProduct(@Param("id")Long id);
+
+            - We use JOIN FETCH to create a inner join with the Table
+            - We could use LEFT JOIN FETCH to create a left join with the Table
+7) Spring security
+    - Install the framework , it offers:
+        - Authentication
+        - Authorization (control list access through roles)
+        -logout
+        - Autentication on memory or database
+        - by default the provide a table user
+    - Adding dependencies in pom.xml
+        <dependencies>
+            ....
+            <dependency>
+			    <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-security</artifactId>
+            </dependency>
+            ....
+        </dependencies>
+    - Run as maven Install
+    - we create new class com.oninvoice.SpringSecurityConfig.java
+        import org.springframework.context.annotation.Configuration;
+        import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+        import org.springframework.security.core.userdetails.User;
+        import org.springframework.security.core.userdetails.UserDetailsService;
+        import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+
+        @Configuration
+        public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
+
+           @Override
+            public UserDetailsService userDetailsServiceBean() throws Exception {
+                InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
+                manager.createUser(User.withUsername("admin").password("asdf1234").roles("ADMIN", "USER").build());
+                manager.createUser(User.withUsername("user").password("asdf1234").roles("USER").build());
+                return manager;
+            }
+
+            @Override
+            protected void configure(HttpSecurity http) throws Exception {
+                http.authorizeRequests().antMatchers("/person/**").permitAll().antMatchers("/invoice/**").hasAnyRole("ADMIN")
+                        .anyRequest().authenticated();
+            }
+
+        }
+    - Authorization
+        
+
+
+
+
+
+
 
 
 

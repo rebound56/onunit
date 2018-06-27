@@ -1,11 +1,11 @@
-package com.oninvoice.models.services;
+package com.oninvoice.models.api;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.oninvoice.models.entities.Invoice;
 
-public interface IInvoiceService {
+public interface IInvoiceApi {
 
 	/**
 	 * THis method returns a Page<Invoice>
