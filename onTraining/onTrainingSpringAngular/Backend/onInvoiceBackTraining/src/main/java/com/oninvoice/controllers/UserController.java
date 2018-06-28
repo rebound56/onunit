@@ -9,23 +9,22 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.oninvoice.models.api.IUserApi;
-import com.oninvoice.models.entities.User;
+import com.oninvoice.models.entities.UserApplication;
+import com.oninvoice.models.services.UserService;
 
 @RestController
 @RequestMapping(value = "/user")
 public class UserController {
 
 	@Autowired
-	private IUserApi userService;
+	private UserService userService;
 
 	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
 
 	@PostMapping(value = "/save")
-	public ResponseEntity<?> login(@RequestBody User user) {
+	public ResponseEntity<?> save(@RequestBody UserApplication user) {
 		user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-		userService.save(user);
-		return new ResponseEntity<User>(user, HttpStatus.OK);
+		return new ResponseEntity<UserApplication>(user, HttpStatus.OK);
 	}
 }

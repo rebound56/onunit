@@ -26,3 +26,10 @@ INSERT INTO product (name, description, gross_price_per_unit, gross_taxes_per_un
 INSERT INTO product (name, description, gross_price_per_unit, gross_taxes_per_unit, created_at , modified_at) VALUES ('LAPTOP LENOVO', 'Laptop lenovo i7', 1510 , 90, NOW(), NOW());
 INSERT INTO product (name, description, gross_price_per_unit, gross_taxes_per_unit, created_at , modified_at) VALUES ('MOUNTAIN BIKE', 'Mountain bike', 1208 , 42, NOW(), NOW());
 
+
+INSERT INTO user (username, password, enabled) VALUES ('andres','$2a$10$O9wxmH/AeyZZzIS09Wp8YOEMvFnbRVJ8B4dmAMVSGloR62lj.yqXG',1);
+INSERT INTO user (username, password, enabled) VALUES ('admin','$2a$10$DOMDxjYyfZ/e7RcBfUpzqeaCs8pLgcizuiQWXPkU35nOhZlFcE9MS',1);
+
+INSERT INTO role (user_id, authority) VALUES (1,'ROLE_USER');
+INSERT INTO role (user_id, authority) VALUES (2,'ROLE_ADMIN');
+INSERT INTO role (user_id, authority) VALUES (2,'ROLE_USER');
