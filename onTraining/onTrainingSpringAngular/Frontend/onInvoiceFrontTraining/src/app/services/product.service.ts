@@ -8,7 +8,7 @@ export class ProductService {
 
   /** This method returns a list of product */
   getAll(){
-    return this.httpClient.get('http://localhost:8080/product/get/all');
+    return this.httpClient.get('http://localhost:8080/api/product/get/all');
   }
 
 }

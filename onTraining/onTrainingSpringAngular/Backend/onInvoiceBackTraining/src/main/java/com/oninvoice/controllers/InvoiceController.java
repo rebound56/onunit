@@ -26,7 +26,7 @@ import com.oninvoice.models.entities.Person;
 import com.oninvoice.util.ErrorMessage;
 
 @RestController
-@RequestMapping(value = "/invoice")
+@RequestMapping(value = "/api/invoice")
 public class InvoiceController {
 
 	@Autowired

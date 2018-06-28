@@ -58,10 +58,13 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 		Collection<? extends GrantedAuthority> roles = authResult.getAuthorities();
 		Claims claims = Jwts.claims();
 		claims.put("authorities", new ObjectMapper().writeValueAsString(roles));
+		claims.setSubject(username);
 
-		String token = Jwts.builder().setSubject(username).setIssuedAt(new Date()).setClaims(claims)
+		String token = Jwts.builder().setIssuedAt(new Date()).setClaims(claims)
 				.setExpiration(new Date(System.currentTimeMillis() + SecurityConstants.EXPIRATION_TIME))
 				.signWith(SignatureAlgorithm.HS512, SecurityConstants.SECRET.getBytes()).compact();
+		
+
 
 		response.addHeader(SecurityConstants.HEADER_STRING, SecurityConstants.TOKEN_PREFIX + token);
 		Map<String, Object> body = new HashMap<String, Object>();
@@ -86,5 +89,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 		response.setStatus(401);
 		response.setContentType("application/json");
 	}
+	
+
 
 }

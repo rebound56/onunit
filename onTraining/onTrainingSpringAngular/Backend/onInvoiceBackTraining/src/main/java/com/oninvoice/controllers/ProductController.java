@@ -14,7 +14,7 @@ import com.oninvoice.models.api.IProductApi;
 import com.oninvoice.models.entities.Product;
 
 @RestController
-@RequestMapping(value = "/product")
+@RequestMapping(value = "/api/product")
 public class ProductController {
 	@Autowired
 	private IProductApi productService;

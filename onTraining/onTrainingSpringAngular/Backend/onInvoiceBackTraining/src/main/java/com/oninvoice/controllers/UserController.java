@@ -13,7 +13,7 @@ import com.oninvoice.models.entities.UserApplication;
 import com.oninvoice.models.services.UserService;
 
 @RestController
-@RequestMapping(value = "/user")
+@RequestMapping(value = "/api/user")
 public class UserController {
 
 	@Autowired
