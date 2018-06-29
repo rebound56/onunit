@@ -1,6 +1,7 @@
 package com.oninvoice.models.entities;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -12,12 +13,16 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 
 @Entity
-@Table(name = "user")
-public class UserApplication implements Serializable {
+@Table
+public class User implements Serializable {
 
 	/**
 	 * 
@@ -27,20 +32,34 @@ public class UserApplication implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+
 	@Column
 	@NotNull
 	private String username;
+
 	@Column
 	@NotNull
 	private String password;
 
+	@Column
+	@NotNull
 	private Boolean enabled;
 
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "user_id")
-	private List<RoleApplication> roleList;
+	private List<Role> roleList;
 
-	public UserApplication() {
+	@Column(name = "created_at")
+	@Temporal(TemporalType.DATE)
+	@NotNull
+	private Date createdAt;
+
+	@Column(name = "modified_at")
+	@Temporal(TemporalType.DATE)
+	@NotNull
+	private Date modifiedAt;
+
+	public User() {
 		super();
 	}
 
@@ -76,12 +95,39 @@ public class UserApplication implements Serializable {
 		this.enabled = enabled;
 	}
 
-	public List<RoleApplication> getRoleList() {
+	public List<Role> getRoleList() {
 		return roleList;
 	}
 
-	public void setRoleList(List<RoleApplication> roleList) {
+	public void setRoleList(List<Role> roleList) {
 		this.roleList = roleList;
+	}
+
+	public Date getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(Date createdAt) {
+		this.createdAt = createdAt;
+	}
+
+	public Date getModifiedAt() {
+		return modifiedAt;
+	}
+
+	public void setModifiedAt(Date modifiedAt) {
+		this.modifiedAt = modifiedAt;
+	}
+
+	@PrePersist
+	public void prePersist() {
+		this.createdAt = new Date();
+		preUpdate();
+	}
+
+	@PreUpdate
+	public void preUpdate() {
+		this.modifiedAt = new Date();
 	}
 
 }

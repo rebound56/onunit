@@ -10,9 +10,11 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import com.oninvoice.models.api.IJwtApi;
 import com.oninvoice.models.services.UserService;
 import com.oninvoice.security.AuthenticationFilter;
 import com.oninvoice.security.AuthorizationFilter;
+import com.oninvoice.security.SecurityConstants;
 
 @Configuration
 @EnableWebSecurity
@@ -23,13 +25,17 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 	private UserService userService;
 
 	@Autowired
+	private IJwtApi jwtService;
+
+	@Autowired
 	private BCryptPasswordEncoder passwordEncoder;
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.cors().and().csrf().disable().authorizeRequests().antMatchers("/api/login").permitAll().anyRequest()
-				.authenticated().and().addFilter(new AuthenticationFilter(authenticationManager()))
-				.addFilter(new AuthorizationFilter(authenticationManager())).sessionManagement()
+		http.cors().and().csrf().disable().authorizeRequests().antMatchers(SecurityConstants.LOGIN_URL).permitAll()
+				.anyRequest().authenticated().and()
+				.addFilter(new AuthenticationFilter(authenticationManager(), jwtService))
+				.addFilter(new AuthorizationFilter(authenticationManager(), jwtService)).sessionManagement()
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 	}
 

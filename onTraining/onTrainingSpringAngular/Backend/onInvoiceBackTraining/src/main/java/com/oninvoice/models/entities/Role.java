@@ -9,8 +9,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "role")
-public class RoleApplication implements Serializable {
+@Table
+public class Role implements Serializable {
 
 	/**
 	 * 
@@ -37,7 +37,7 @@ public class RoleApplication implements Serializable {
 		this.authority = authority;
 	}
 
-	public RoleApplication() {
+	public Role() {
 		super();
 	}
 

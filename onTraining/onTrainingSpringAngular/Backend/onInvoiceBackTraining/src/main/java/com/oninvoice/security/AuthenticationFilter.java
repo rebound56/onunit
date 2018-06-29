@@ -1,8 +1,6 @@
 package com.oninvoice.security;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,35 +13,45 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import com.oninvoice.models.api.IJwtApi;
 
 public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
 	/** It allows to authenticate */
 	private AuthenticationManager authenticationManager;
+	private IJwtApi jwtService;
 
-	public AuthenticationFilter(AuthenticationManager authenticationManager) {
+	public AuthenticationFilter(AuthenticationManager authenticationManager, IJwtApi jwtService) {
 		this.authenticationManager = authenticationManager;
-		setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher("/api/login", "POST"));
+		this.jwtService = jwtService;
+		setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher(SecurityConstants.LOGIN_URL, "POST"));
 	}
 
 	@Override
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
 			throws AuthenticationException {
-		String username = obtainUsername(request) != null ? obtainUsername(request).trim() : "";
-		String password = obtainPassword(request) != null ? obtainPassword(request) : "";
 
-		logger.info("Username : " + username);
-		logger.info("Password : " + password);
+		String username = obtainUsername(request);
+		String password = obtainPassword(request);
+
+		if (username == null || password == null) {
+			try {
+				com.oninvoice.models.entities.User user = new ObjectMapper().readValue(request.getInputStream(),
+						com.oninvoice.models.entities.User.class);
+				if (user != null) {
+					username = user.getUsername();
+					password = user.getPassword();
+				}
+
+			} catch (IOException e) {				
+				logger.error("Error to try parse json to user", e);
+			}
+		}
 
 		UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(username, password);
 		return this.authenticationManager.authenticate(authToken);
@@ -51,20 +59,11 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
 	@Override
 	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
-			Authentication authResult) throws IOException, ServletException {
+			Authentication authentication) throws IOException, ServletException {
 
-		String username = ((User) authResult.getPrincipal()).getUsername();
+		String token = this.jwtService.create(authentication);
 
-		Collection<? extends GrantedAuthority> roles = authResult.getAuthorities();
-		Claims claims = Jwts.claims();
-		claims.put("authorities", new ObjectMapper().writeValueAsString(roles));
-		claims.setSubject(username);
-
-		String token = Jwts.builder().setIssuedAt(new Date()).setClaims(claims)
-				.setExpiration(new Date(System.currentTimeMillis() + SecurityConstants.EXPIRATION_TIME))
-				.signWith(SignatureAlgorithm.HS512, SecurityConstants.SECRET.getBytes()).compact();
-		
-
+		String username = ((User) authentication.getPrincipal()).getUsername();
 
 		response.addHeader(SecurityConstants.HEADER_STRING, SecurityConstants.TOKEN_PREFIX + token);
 		Map<String, Object> body = new HashMap<String, Object>();
@@ -89,7 +88,5 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 		response.setStatus(401);
 		response.setContentType("application/json");
 	}
-	
-
 
 }

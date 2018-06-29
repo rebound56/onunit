@@ -31,7 +31,6 @@ public class PersonController {
 	@Autowired
 	private IPersonApi personService;
 
-	@Secured( {"ROLE_ADMIN", "ROLE_USER"} )
 	@GetMapping(value = "/get/all")
 	public ResponseEntity<Page<Person>> getAll(@RequestParam Map<String, String> mapRequest) {
 		int page = 0;
@@ -74,6 +73,7 @@ public class PersonController {
 		}
 	}
 
+	@Secured({ "ROLE_ADMIN" })
 	@DeleteMapping(value = "/delete/{id}")
 	public ResponseEntity<?> delete(@PathVariable(name = "id") Long id) {
 		try {
