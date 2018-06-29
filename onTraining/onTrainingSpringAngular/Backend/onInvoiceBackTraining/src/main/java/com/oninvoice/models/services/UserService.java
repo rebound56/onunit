@@ -17,7 +17,7 @@ import com.oninvoice.models.daos.IUserDao;
 import com.oninvoice.models.entities.Role;
 import com.oninvoice.models.entities.User;
 
-@Service("userService")
+@Service
 public class UserService implements UserDetailsService, IUserApi {
 	@Autowired
 	private IUserDao userDao;

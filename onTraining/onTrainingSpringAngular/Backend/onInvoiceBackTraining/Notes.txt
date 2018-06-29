@@ -305,44 +305,72 @@
 			    <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-security</artifactId>
             </dependency>
+
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt</artifactId>
+                <version>0.9.0</version>
+            </dependency>
             ....
         </dependencies>
     - Run as maven Install
-    - we create new class com.oninvoice.SpringSecurityConfig.java
-        import org.springframework.context.annotation.Configuration;
-        import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-        import org.springframework.security.core.userdetails.User;
-        import org.springframework.security.core.userdetails.UserDetailsService;
-        import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+    - JWT is a standard of authentication the page is jwt.io , the token has trhee parts separated by period (.)
+    - We are gonna work with JWT:
+        - First we are gonna create two entities User and Role like this
+            - in com.oninvoice.models.entities.Role
 
-        @Configuration
-        public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
+                @Entity
+                @Table
+                public class Role implements Serializable {
+                    ...
+                    @Id
+                    @GeneratedValue(strategy = GenerationType.IDENTITY)
+                    private Long id;
+                    private String authority;
+                    ...
+                }
 
-           @Override
-            public UserDetailsService userDetailsServiceBean() throws Exception {
-                InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
-                manager.createUser(User.withUsername("admin").password("asdf1234").roles("ADMIN", "USER").build());
-                manager.createUser(User.withUsername("user").password("asdf1234").roles("USER").build());
-                return manager;
+             - in com.oninvoice.models.entities.User
+
+                @Entity
+                @Table
+                public class User implements Serializable {
+                    ...
+                    @Id
+                    @GeneratedValue(strategy = GenerationType.IDENTITY)
+                    private Long id;
+
+                    @Column
+                    @NotNull
+                    private String username;
+
+                    @Column
+                    @NotNull
+                    private String password;
+
+                    @Column
+                    @NotNull
+                    private Boolean enabled;
+
+                    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+                    @JoinColumn(name = "user_id")
+                    private List<Role> roleList;
+
+                    @Column(name = "created_at")
+                    @Temporal(TemporalType.DATE)
+                    @NotNull
+                    private Date createdAt;
+
+                    @Column(name = "modified_at")
+                    @Temporal(TemporalType.DATE)
+                    @NotNull
+                    private Date modifiedAt;
+                    ....
+                }
+        - Second we are gonna build a new service that implements UserDetail
+            @Service
+            public class UserService implements UserDetailsService{
+                
             }
-
-            @Override
-            protected void configure(HttpSecurity http) throws Exception {
-                http.authorizeRequests().antMatchers("/person/**").permitAll().antMatchers("/invoice/**").hasAnyRole("ADMIN")
-                        .anyRequest().authenticated();
-            }
-
-        }
-    - Authorization
-        
-
-
-
-
-
-
-
-
-
 
     
