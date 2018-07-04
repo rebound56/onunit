@@ -12,7 +12,7 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import { NgHttpLoaderModule } from 'ng-http-loader/ng-http-loader.module';
 import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from "@angular/forms";
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { PersonService } from './services/person.service';
 import { DatatableComponent } from './components/datatable/datatable.component';
 import { PersonViewComponent } from './components/person-view/person-view.component';
@@ -21,6 +21,10 @@ import { InvoiceService } from './services/invoice.service';
 import { InvoiceFormComponent } from './components/invoice-form/invoice-form.component';
 import { ProductService } from './services/product.service';
 import { InvoiceDetailComponent } from './components/invoice-detail/invoice-detail.component';
+import { LoginComponent } from './components/login/login.component';
+import { AuthService } from './services/auth.service';
+import { JwtModule } from '@auth0/angular-jwt'
+import { TokenInterceptor } from './interceptors/token.interceptor';
 
 @NgModule({
   declarations: [
@@ -32,7 +36,8 @@ import { InvoiceDetailComponent } from './components/invoice-detail/invoice-deta
     PersonViewComponent,
     PersonInvoiceListComponent,
     InvoiceFormComponent,
-    InvoiceDetailComponent
+    InvoiceDetailComponent,
+    LoginComponent
   ],
   imports: [
     BrowserModule,
@@ -42,9 +47,27 @@ import { InvoiceDetailComponent } from './components/invoice-detail/invoice-deta
     NgHttpLoaderModule,
     FormsModule,
     ReactiveFormsModule,
-    HttpClientModule
+    HttpClientModule,
+    JwtModule.forRoot({
+      config:{
+        tokenGetter : function(){
+          return localStorage.getItem('token');
+        },
+        whitelistedDomains: ['localhost:8080']
+      }
+    })
   ],
-  providers: [PersonService, InvoiceService, ProductService],
+  providers: [
+    PersonService, 
+    InvoiceService, 
+    ProductService, 
+    AuthService,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: TokenInterceptor,
+      multi: true
+    }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

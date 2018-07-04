@@ -367,10 +367,266 @@
                     private Date modifiedAt;
                     ....
                 }
-        - Second we are gonna build a new service that implements UserDetail
-            @Service
-            public class UserService implements UserDetailsService{
-                
-            }
+
+        - Third we are gonna build a new interface Dao 
+            - in com.invoice.models.daos.IUserDao
+
+                public interface IUserDao extends JpaRepository<User, Long> {
+                    public User findByUsername(String username);
+                }
+
+        - Forth we are gonna build a new service that implements UserDetail.
+        - Note: this service is gonna execute when a user is loggin in
+            - in com.oninvoice.models.services.UserService
+                @Service
+                public class UserService implements UserDetailsService{
+                    @Autowired
+                    private IUserDao userDao;
+
+                    @Override
+                    @Transactional(readOnly = true)
+                    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+
+                        User user = userDao.findByUsername(username);
+
+                        if (user == null)
+                            throw new UsernameNotFoundException("Username " + username + " does not exist in the system");
+
+                        if (user.getRoleList() == null || user.getRoleList().size() == 0)
+                            throw new UsernameNotFoundException("Username '" + username + "' does not have roles");
+
+                        List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
+                        for (Role role : user.getRoleList())
+                            authorities.add(new SimpleGrantedAuthority(role.getAuthority()));
+
+                        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(),
+                                user.getEnabled(), true, true, true, authorities);
+                    }
+                }
+        - Fifth: it is necessary to create a service with the JWT operations
+            - in com.oninvoice.models.api.IJwtApi
+                public interface IJwtApi {
+                  
+                    public String create(Authentication authentication) throws JsonProcessingException;                   
+                    public boolean validate(String token);
+                    public Claims getClaims(String token);                   
+                    public String getUsername(String token);                   
+                    public List<GrantedAuthority> getAuthorities(String token) throws IOException;                    
+                    public String resolve(String token);
+                }
+            - in com.oninvoice.models.api.JwtService
+                @Service
+                public class JwtService implements IJwtApi {
+
+                    @Override
+                    public String create(Authentication authentication) throws JsonProcessingException {
+
+                        String username = ((User) authentication.getPrincipal()).getUsername();
+                        Collection<? extends GrantedAuthority> roles = authentication.getAuthorities();
+                        Claims claims = Jwts.claims();
+                        claims.put("authorities", new ObjectMapper().writeValueAsString(roles));
+                        claims.setSubject(username);
+
+                        return Jwts.builder().setIssuedAt(new Date()).setClaims(claims)
+                                .setExpiration(new Date(System.currentTimeMillis() + SecurityConstants.EXPIRATION_TIME))
+                                .signWith(SignatureAlgorithm.HS512, SecurityConstants.SECRET.getBytes()).compact();
+                    }
+
+                    @Override
+                    public boolean validate(String token) {
+                        try {
+                            getClaims(token);
+                            return true;
+                        } catch (JwtException | IllegalArgumentException ex) {
+                            return false;
+                        }
+                    }
+
+                    @Override
+                    public Claims getClaims(String token) {
+                        return Jwts.parser().setSigningKey(SecurityConstants.SECRET.getBytes())
+                                .parseClaimsJws(resolve(token)).getBody();
+                    }
+
+                    @Override
+                    public String getUsername(String token) {
+                        return getClaims(token).getSubject();
+                    }
+
+                    @Override
+                    public List<GrantedAuthority> getAuthorities(String strToken) throws IOException {
+                        Claims token = getClaims(strToken);
+                        Object roles = token.get("authorities");
+                        List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
+                        Role[] listRole = new ObjectMapper().readValue(roles.toString().getBytes(), Role[].class);
+                        if (listRole != null) {
+                            for (Role role : listRole) {
+                                authorities.add(new SimpleGrantedAuthority(role.getAuthority()));
+                            }
+                        }
+                        return authorities;
+                    }
+
+                    @Override
+                    public String resolve(String token) {
+                        if (token != null && token.startsWith(SecurityConstants.TOKEN_PREFIX))
+                            return token.replace(SecurityConstants.TOKEN_PREFIX, "");
+                        return null;
+                    }
+                }
+        - Sisxth : we are gonn create the filters
+            - but first we are gonna build the SecurityConstants
+                package com.oninvoice.security;
+
+                public class SecurityConstants {
+                    public static final String SECRET = "SecretKeyToGenJWTs";
+                    public static final long EXPIRATION_TIME = 864_000_000; // 10 days
+                    public static final String TOKEN_PREFIX = "Bearer ";
+                    public static final String HEADER_STRING = "Authorization";
+                    public static final String LOGIN_URL = "/api/user/login";
+                }
+
+            - in com.oninvoice.security.AuthenticationFilter
+                public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+
+                    /** It allows to authenticate */
+                    private AuthenticationManager authenticationManager;
+                    private IJwtApi jwtService;
+
+                    public AuthenticationFilter(AuthenticationManager authenticationManager, IJwtApi jwtService) {
+                        this.authenticationManager = authenticationManager;
+                        this.jwtService = jwtService;
+                        setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher(SecurityConstants.LOGIN_URL, "POST"));
+                    }
+
+                    @Override
+                    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
+                            throws AuthenticationException {
+
+                        String username = obtainUsername(request);
+                        String password = obtainPassword(request);
+
+                        if (username == null || password == null) {
+                            try {
+                                com.oninvoice.models.entities.User user = new ObjectMapper().readValue(request.getInputStream(),
+                                        com.oninvoice.models.entities.User.class);
+                                if (user != null) {
+                                    username = user.getUsername();
+                                    password = user.getPassword();
+                                }
+
+                            } catch (IOException e) {				
+                                logger.error("Error to try parse json to user", e);
+                            }
+                        }
+
+                        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(username, password);
+                        return this.authenticationManager.authenticate(authToken);
+                    }
+
+                    @Override
+                    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
+                            Authentication authentication) throws IOException, ServletException {
+
+                        String token = this.jwtService.create(authentication);
+
+                        String username = ((User) authentication.getPrincipal()).getUsername();
+
+                        response.addHeader(SecurityConstants.HEADER_STRING, SecurityConstants.TOKEN_PREFIX + token);
+                        Map<String, Object> body = new HashMap<String, Object>();
+                        body.put("token", token);
+                        body.put("user", username);
+                        body.put("message", String.format("Hello %s has logged up!", username));
+
+                        response.getWriter().write(new ObjectMapper().writeValueAsString(body));
+                        response.setStatus(200);
+                        response.setContentType("application/json");
+                    }
+
+                    @Override
+                    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
+                            AuthenticationException failed) throws IOException, ServletException {
+
+                        Map<String, Object> body = new HashMap<String, Object>();
+                        body.put("message", "Username or password incorrect");
+                        body.put("error", failed.getMessage());
+
+                        response.getWriter().write(new ObjectMapper().writeValueAsString(body));
+                        response.setStatus(401);
+                        response.setContentType("application/json");
+                    }
+
+                }
+            - in com.oninvoice.security.AuthorizationFilter
+                public class AuthorizationFilter extends BasicAuthenticationFilter {
+
+                    private IJwtApi jwtService;
+
+                    public AuthorizationFilter(AuthenticationManager authenticationManager, IJwtApi jwtService) {
+                        super(authenticationManager);
+                        this.jwtService = jwtService;
+                    }
+
+                    @Override
+                    protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
+                            throws IOException, ServletException {
+                        
+                        String header = req.getHeader(SecurityConstants.HEADER_STRING);
+                        if (!requiresAuthentication(header)) {
+                            chain.doFilter(req, res);
+                            return;
+                        }
+                        
+                        UsernamePasswordAuthenticationToken authentication = null;
+                        if (this.jwtService.validate(header))
+                            authentication = new UsernamePasswordAuthenticationToken(this.jwtService.getAuthorities(header), null,
+                                    this.jwtService.getAuthorities(header));
+
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                        chain.doFilter(req, res);
+
+                    }
+
+                    protected boolean requiresAuthentication(String header) {
+                        if (header == null || !header.startsWith(SecurityConstants.TOKEN_PREFIX))
+                            return false;
+                        return true;
+                    }
+                }
+
+         - Seventh : We create the spring configuration to assemble the filters 
+            - in com.oninvoice.SpringSecurityConfig
+                @Configuration
+                @EnableWebSecurity
+                @EnableGlobalMethodSecurity(securedEnabled = true)
+                public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
+
+                    @Autowired
+                    private UserService userService;
+
+                    @Autowired
+                    private IJwtApi jwtService;
+
+                    @Autowired
+                    private BCryptPasswordEncoder passwordEncoder;
+
+                    @Override
+                    protected void configure(HttpSecurity http) throws Exception {
+                        http.cors().and().csrf().disable().authorizeRequests().antMatchers(SecurityConstants.LOGIN_URL).permitAll()
+                                .anyRequest().authenticated().and()
+                                .addFilter(new AuthenticationFilter(authenticationManager(), jwtService))
+                                .addFilter(new AuthorizationFilter(authenticationManager(), jwtService)).sessionManagement()
+                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                    }
+
+                    @Override
+                    public void configure(AuthenticationManagerBuilder auth) throws Exception {
+                        auth.userDetailsService(userService).passwordEncoder(passwordEncoder);
+                    }
+                }
+
+            
+
+
 
     
