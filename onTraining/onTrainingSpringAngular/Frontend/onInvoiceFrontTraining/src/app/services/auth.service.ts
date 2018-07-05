@@ -2,11 +2,12 @@ import { Injectable } from '@angular/core';
 import { HttpClient,HttpHeaders } from '@angular/common/http';
 import { User } from '../models/user';
 import { JwtHelperService } from '@auth0/angular-jwt';
-
+import {BehaviorSubject, Observable} from 'rxjs';
 
 @Injectable()
 export class AuthService {
 
+  private isLoginSubject = new BehaviorSubject<boolean>(this.hasToken());
   constructor(private httpClient: HttpClient, private jwtHelper: JwtHelperService) { }
 
   login(user: User){
@@ -16,6 +17,7 @@ export class AuthService {
 
   setToken(token: string){
     localStorage.setItem("token", token);
+    this.isLoginSubject.next(true);    
   }
 
   getToken(){
@@ -24,9 +26,15 @@ export class AuthService {
 
   removeToken(){
     localStorage.removeItem("token");
+    this.isLoginSubject.next(false);
   }
 
-  isAuthenticated(){
-    return this.getToken() != undefined && this.jwtHelper.isTokenExpired(this.getToken());
+  hasToken() : boolean{
+    return this.getToken() != undefined && this.getToken() != null && !this.jwtHelper.isTokenExpired(this.getToken());   
   }
+
+  isAuthenticated() : Observable<boolean> {
+    return this.isLoginSubject.asObservable();
+  }
+
 }

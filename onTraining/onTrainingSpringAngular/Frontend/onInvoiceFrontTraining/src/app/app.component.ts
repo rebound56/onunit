@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -6,5 +7,19 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'app';
+  loggedIn : boolean = false;
+  constructor(private authService: AuthService){ 
+    this.authService.isAuthenticated().subscribe((result : boolean)=>{
+      debugger;
+      this.loggedIn = result;
+    }, (error)=>{
+      debugger;
+      this.loggedIn= false;
+      console.log("ERROR", error);      
+    })
+  }
+
+  logout(){
+    this.authService.removeToken();
+  }
 }

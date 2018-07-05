@@ -22,13 +22,13 @@ export class TokenInterceptor implements HttpInterceptor {
   }
 
   private onSuccessResponse(event : HttpEvent<any>){
-    debugger;
+    
     if(event instanceof HttpResponse){
       // do something with the response
     }
   }
   private onErrorResponse(error : any){
-    debugger;
+    
     if(error instanceof HttpErrorResponse){
       if(error.status === 401){
         // do something when the status is unauthorized
