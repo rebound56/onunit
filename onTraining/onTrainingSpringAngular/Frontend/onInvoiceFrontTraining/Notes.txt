@@ -90,5 +90,280 @@
         ReactiveFormsModule,
         HttpClientModule
         ...
+9) Security
+    - First, we are gonna create a service called AuthService
+        - We execute 
+            ng g s services/Auth
+        - in services/auth.service.ts
+            import { Injectable } from '@angular/core';
+            import { HttpClient,HttpHeaders } from '@angular/common/http';
+            import { User } from '../models/user';
+            import { JwtHelperService } from '@auth0/angular-jwt';
+            import {BehaviorSubject, Observable} from 'rxjs';
+
+            @Injectable()
+            export class AuthService {
+
+                private isLoginSubject = new BehaviorSubject<boolean>(this.hasToken());
+                constructor(private httpClient: HttpClient, private jwtHelper: JwtHelperService) { }
+
+                login(user: User){
+                    return this.httpClient.post('http://localhost:8080/api/user/login',user,
+                    {headers: new HttpHeaders({'Content-Type':'application/json'})});
+                }
+
+                setToken(token: string){
+                    localStorage.setItem("token", token);
+                    this.isLoginSubject.next(true);    
+                }
+
+                getToken(){
+                    return localStorage.getItem("token");
+                }
+
+                removeToken(){
+                    localStorage.removeItem("token");
+                    this.isLoginSubject.next(false);
+                }
+
+                hasToken() : boolean{
+                    return this.getToken() != undefined && this.getToken() != null && !this.jwtHelper.isTokenExpired(this.getToken());   
+                }
+
+                isAuthenticated() : Observable<boolean> {
+                    return this.isLoginSubject.asObservable();
+                }
+
+            }
+
+    - Second, we are gonna create a component called login
+        - in login.component.ts
+
+            export class LoginComponent implements OnInit {
+
+                formLogin : FormGroup;
+                controlUsername : FormControl;
+                controlPassword: FormControl;
+                user: User;
+
+                constructor(private authService: AuthService, private toasterService : ToasterService) { }
+
+                ngOnInit() {
+                    this.initForm();
+                }
+
+                initForm(){
+                    this.user = new User();
+                    this.controlPassword = new FormControl(this.user.password,[Validators.required]);
+                    this.controlUsername = new FormControl(this.user.username,[Validators.required]);
+                    // add controls to form
+                    this.formLogin = new FormGroup({
+                    controlPassword:this.controlPassword,
+                    controlUsername:this.controlUsername
+                    });
+                }
+
+                login(){
+                    if(!this.formLogin.valid)
+                    FormUtil.validateFormFields(this.formLogin);
+                    else{
+                    this.authService.login(this.user).subscribe((result:any) => {
+                        this.authService.setToken(result.token);        
+                        this.toasterService.pop("success", "Logged in", "The user has logged in!");
+                    }, (error) => {
+                        debugger;
+                        if(error.status === 401)
+                        this.toasterService.pop("warning", "Error", "Username or password incorrect");
+                        else 
+                        this.toasterService.pop("error", "Error", "Error trying to log in");
+                    });
+                    }
+                }
+
+                /** This methods returns a boolean if the control has any error */
+                hasErrors(formControl : FormControl){
+                    return FormUtil.hasErrors(formControl);
+                } 
+                /** This methods returns a boolean if the control has a specific error */
+                hasError(formControl : FormControl, error:string){
+                    return FormUtil.hasError(formControl,error);
+                } 
+            }
+
+        - in login.component.html
+
+            <form [formGroup]="formLogin" (ngSubmit)="login()">
+                <div class="row">
+                    <div class="offset-md-4 col-md-4">
+                    <div class="card ">
+                        <div class="card-header bg-dark text-white">
+                            <h3 class="no-margin">Log in</h3>
+                        </div>
+                    
+                        <div class="card-body">
+                            <div class="row">
+
+                            <div class="col-md-12">
+                            <div class="form-group" [ngClass]="{'has-error': hasErrors(controlUsername)}">     
+                                <label for="name" class="form-control-label">Username</label>
+                                <input type="text" class="form-control" name="username" id="username" placeholder="Username" formControlName="controlUsername" [(ngModel)]="user.username" />
+                                <div class="form-control-feedback">
+                                    <small *ngIf="hasError(controlUsername,'required')">Username is required</small>      
+                                </div>      
+                            </div>
+                            </div>
+
+                            <div class="col-md-12">
+                            <div class="form-group" [ngClass]="{'has-error': hasErrors(controlPassword)}">     
+                                <label for="name" class="form-control-label">Password</label>
+                                <input type="password" class="form-control" name="password" id="password" placeholder="Password" formControlName="controlPassword" [(ngModel)]="user.password" />
+                                <div class="form-control-feedback">
+                                    <small *ngIf="hasError(controlPassword,'required')">Password is required</small>      
+                                </div>      
+                            </div>
+                            </div>
+                        </div>  
+                        </div> 
+                        <div class="card-footer">
+                        <div class="row">
+                            <div class="offset-md-6 col-md-6">
+                                <button type="submit" class="btn btn-success form-control">Log in</button>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </form>   
+
+    - Third we create a interceptor that provides the headers to the request
+        - in interceptos/token.interceptor.ts
+
+            import { Injectable } from '@angular/core';
+            import { HttpEvent, HttpErrorResponse,HttpRequest,HttpInterceptor, HttpSentEvent, HttpHeaderResponse, HttpProgressEvent, HttpResponse, HttpUserEvent, HttpHandler } from '@angular/common/http';
+            import { Observable } from 'rxjs/Observable';
+            import { AuthService } from '../services/auth.service';
+            import 'rxjs/add/operator/do';
+
+            @Injectable()
+            export class TokenInterceptor implements HttpInterceptor {
+            
+
+                constructor(private authService : AuthService) { }
+
+                intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+                    let request: HttpRequest<any> = req;
+                    
+                    if(this.authService.hasToken()){
+                        request = req.clone({
+                            headers : req.headers.set("Authorization", "Bearer "+this.authService.getToken())
+                        });     
+                    }
+                    return next.handle(request).do(this.onSuccessResponse, this.onErrorResponse);
+                }
+
+                private onSuccessResponse(event : HttpEvent<any>){
+                    
+                    if(event instanceof HttpResponse){
+                    // do something with the response
+                    }
+                }
+                private onErrorResponse(error : any){
+                    
+                    if(error instanceof HttpErrorResponse){
+                    if(error.status === 401){
+                        // do something when the status is unauthorized
+                    }
+                    if(error.status === 403){
+                        // do something when the status is forbidden 
+                    }
+                    if(error.status === 500){
+                        // do something  when the status is failed
+                    }
+                    if(error.status === 0){
+                        // do something when the status is down
+                    }
+                    }
+                }
+            }
+        - We add the interceptor in app.module.ts
+            ...
+            imports: [
+                ....
+                JwtModule.forRoot({
+                config:{
+                    tokenGetter : function(){
+                    return localStorage.getItem('token');
+                    },
+                    whitelistedDomains: ['localhost:8080']
+                }
+                })
+            ],
+            ...
+            providers: [
+                ...
+                {
+                provide: HTTP_INTERCEPTORS,
+                useClass: TokenInterceptor,
+                multi: true
+                }
+            ],
+    - Next we create a guardian
+        - We execute 
+            ng g s services/guard
+        - in services/guard.service.ts
+            import { Injectable } from '@angular/core';
+            import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+            import { Observable } from 'rxjs';
+            import { AuthService } from './auth.service';
+
+            @Injectable()
+            export class GuardService implements CanActivate{
+                loggedIn : boolean = false;
+
+                constructor(private authService: AuthService) { 
+                    this.authService.isAuthenticated().subscribe((result: boolean) => {
+                    this.loggedIn = result;
+                    }, (error)=> {
+                    this.loggedIn = false;
+                    console.log("error", error);
+                    })
+                }
+
+                canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean | Observable<boolean> | Promise<boolean> {
+                    return this.loggedIn;
+                }
+            }
+        - Add the guard in de routing module
+            - in module/routing/routing.module.ts
+                import { NgModule } from '@angular/core';
+                import { RouterModule, Routes } from '@angular/router';
+                import { CommonModule } from '@angular/common';
+                import { PersonFormComponent } from '../../components/person-form/person-form.component';
+                import { PersonListComponent } from '../../components/person-list/person-list.component';
+                import { PersonDetailComponent } from '../../components/person-detail/person-detail.component';
+                import { InvoiceFormComponent } from '../../components/invoice-form/invoice-form.component';
+                import { InvoiceDetailComponent } from '../../components/invoice-detail/invoice-detail.component';
+                import { LoginComponent } from '../../components/login/login.component';
+                import { GuardService } from '../../services/guard.service';
+
+                const routes: Routes = [   
+                { path: 'person/form/:id', component: PersonFormComponent, canActivate : [GuardService] },
+                { path: 'person/detail/:id', component: PersonDetailComponent, canActivate : [GuardService] },  
+                { path: 'person/form', component: PersonFormComponent, canActivate : [GuardService] },
+                { path: 'invoice/:idPerson/form/:id', component: InvoiceFormComponent, canActivate : [GuardService] },
+                { path: 'invoice/:idPerson/detail/:id', component: InvoiceDetailComponent, canActivate : [GuardService] },
+                { path: 'invoice/:idPerson/form', component: InvoiceFormComponent, canActivate : [GuardService] },
+                { path: 'person/list', component: PersonListComponent, canActivate : [GuardService] }
+                ];
+                @NgModule({
+                    imports: [RouterModule.forRoot(routes)],
+                    exports: [RouterModule],
+                    declarations: [],
+                    providers : [
+                        GuardService
+                    ]
+                })
+                export class RoutingModule { }
 
 

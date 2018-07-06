@@ -13,7 +13,7 @@ export class TokenInterceptor implements HttpInterceptor {
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     let request: HttpRequest<any> = req;
     
-    if(this.authService.isAuthenticated()){
+    if(this.authService.hasToken()){
       request = req.clone({
         headers : req.headers.set("Authorization", "Bearer "+this.authService.getToken())
       });     
@@ -34,7 +34,13 @@ export class TokenInterceptor implements HttpInterceptor {
         // do something when the status is unauthorized
       }
       if(error.status === 403){
-        // do something when the status is forbidden
+        // do something when the status is forbidden 
+      }
+      if(error.status === 500){
+        // do something  when the status is failed
+      }
+      if(error.status === 0){
+        // do something when the status is down
       }
     }
   }
